@@ -19,15 +19,15 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>4</string>
+	<string>5</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.1.4</string>
+	<string>1.1.5</string>
 	<key>UpdateFeedURL</key>
-	<string>https://raw.githubusercontent.com/DeutschMark/Glyphsapp-Plugins/master/ShowRotated/ShowRotated.glyphsReporter/Contents/Info.plist</string>
+	<string>https://raw.githubusercontent.com/DeutschMark/Show-Rotated/master/ShowRotated.glyphsReporter/Contents/Info.plist</string>
 	<key>productPageURL</key>
-	<string>https://github.com/DeutschMark/Glyphsapp-Plugins</string>
+	<string>https://github.com/DeutschMark/Show-Rotated</string>
 	<key>productReleaseNotes</key>
-	<string>Removed Cocoa import to speed it up, Rotates according to Transform panel value</string>
+	<string>Now rotates in the angle that is defined in the palette. If there is none default rotation is 180°</string>
 	<key>LSHasLocalizedDisplayName</key>
 	<false/>
 	<key>NSAppleScriptEnabled</key>
