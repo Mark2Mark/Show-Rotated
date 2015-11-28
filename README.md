@@ -2,7 +2,9 @@
 
 ## Plugin for Glyphsapp
 
-This is a Plugin for the [Glyphs font editor](http://glyphsapp.com/). It superimposes the current shown glyph as a rotated copy of it self. If you enter a rotation value in the Transformations Palette, this plugin will resemble this value. If it is 0 or None, the rotation will be exactly 180°. This can be pretty helpful when working on symmetric characters (e.g. [0, O, o, S, s, Z, z, X, x, …]). The degree of a desired match depends on each design, of course. It is not nessessary to match the drawing with it’s rotated counterpart, but it can indeed help to balance letters in matters of weight distribution and/or optical centering.
+This is a Plugin for the [Glyphs font editor](http://glyphsapp.com/). It superimposes the current shown glyph as a rotated copy of it self.  
+If you enter a rotation value in the `Transformations Palette`, this plugin will resemble that very value. If it is `0` or `None`, the rotation will be exactly `180°`.  
+This can be helpful when working on symmetric characters (e.g. `0, O, o, S, s, Z, z, X, x, …`). The degree of a desired match depends on each design, of course. It is not nessessary to match the drawing with it’s rotated counterpart, but it can indeed help to balance letters in matters of weight distribution and/or optical centering.
 
 ### Install
 
