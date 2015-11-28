@@ -1,8 +1,8 @@
 # Show Rotated
 
-## Plugin for Glyphsapp
+*This is a plugin for the [Glyphs font editor](http://glyphsapp.com/).*  
 
-This is a Plugin for the [Glyphs font editor](http://glyphsapp.com/). It superimposes the current glyph as a rotated copy of itself.  
+It superimposes the current glyph as a rotated copy of itself.  
 If you enter a rotation value in the `Transformations Palette`, this plugin will resemble that very value. If it is `0` or `None`, the rotation will be exactly `180°`.  
 This can be helpful when working on symmetric characters (e.g. `0, O, o, S, s, Z, z, X, x, …`). The degree of a desired match depends on each design, of course. It is not nessessary to match the drawing with it’s rotated counterpart, but it can indeed help to balance letters in matters of weight distribution and/or optical centering.
 
@@ -30,15 +30,15 @@ When ever you need it, toggle `Show * Rotated` from the view menu.
 ![Show Rotated Demo](https://github.com/DeutschMark/Show-Rotated/blob/master/Screenshots/Show%20Rotated%20-%20Mark%20-%20Froemberg%2004-png.png?raw=true "Show Rotated Demo")
 
 
-#### Known issues
+##### Known issues
 
 - None so far
 
-#### Pull Requests
+##### Pull Requests
 
 Feel free to comment or pull requests for any improvements.
 
-#### License
+##### License
 
 Copyright 2015 [Mark Frömberg](http://www.markfromberg.com/) *@DeutschMark*
 
