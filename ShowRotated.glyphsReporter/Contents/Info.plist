@@ -19,9 +19,9 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>5</string>
+	<string>6</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.1.5</string>
+	<string>1.1.6</string>
 	<key>UpdateFeedURL</key>
 	<string>https://raw.githubusercontent.com/DeutschMark/Show-Rotated/master/ShowRotated.glyphsReporter/Contents/Info.plist</string>
 	<key>productPageURL</key>
