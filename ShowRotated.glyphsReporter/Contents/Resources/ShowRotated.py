@@ -73,11 +73,18 @@ class ShowRotated ( NSObject, GlyphsReporterProtocol ):
 		except Exception as e:
 			self.logToConsole( "rotationTransform: %s" % str(e) )
 
+	def bezierPathComp( self, thisPath ):
+		"""Compatibility method for bezierPath before v2.3."""
+		try:
+			return thisPath.bezierPath() # until v2.2
+		except Exception as e:
+			return thisPath.bezierPath # v2.3+
+
 	def drawRotated( self, Layer ):
 
 		Glyph = Layer.parent
 
-		thisBezierPathWithComponent = Layer.copyDecomposedLayer().bezierPath()
+		thisBezierPathWithComponent = self.bezierPathComp(Layer.copyDecomposedLayer())
 
 		bounds = Layer.bounds
 		x = bounds.origin.x + 0.5 * bounds.size.width
