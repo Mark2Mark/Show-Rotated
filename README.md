@@ -10,9 +10,9 @@ Download or clone the whole `Glyphsapp-Plugins`repo (it will contain more plugin
 
 ### Examples
 
-![Show Rotated Demo](https://github.com/DeutschMark/Glyphsapp-Plugins/blob/Screenshots/ShowRotated/Screenshots/ShowRotated-Mark-Froemberg-1200.png?raw=true "Show Rotated Demo")
+![Show Rotated Demo](https://github.com/Mark2Mark/Glyphsapp-Plugins/blob/Screenshots/ShowRotated/Screenshots/ShowRotated-Mark-Froemberg-1200.png?raw=true "Show Rotated Demo")
 
-![Show Rotated live Demo](https://github.com/DeutschMark/Glyphsapp-Plugins/blob/Screenshots/ShowRotated/Screenshots/ShowRotated03_Mark-Froemberg.gif?raw=true "Show Rotated live Demo")
+![Show Rotated live Demo](https://github.com/Mark2Mark/Glyphsapp-Plugins/blob/Screenshots/ShowRotated/Screenshots/ShowRotated03_Mark-Froemberg.gif?raw=true "Show Rotated live Demo")
 
 
 ### Known issues
@@ -25,7 +25,7 @@ Feel free to comment or pull requests for any improvements.
 
 ### License
 
-Copyright 2015 [Mark Frömberg](http://www.markfromberg.com/) *@DeutschMark*
+Copyright 2015 [Mark Frömberg](http://www.markfromberg.com/) *@Mark2Mark*
 
 Made possible with the GlyphsSDK by Georg Seifert (@schriftgestalt) and Rainer Erich Scheichelbauer (@mekkablue).
 
