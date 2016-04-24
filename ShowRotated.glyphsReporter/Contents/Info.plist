@@ -27,7 +27,7 @@
 	<key>productPageURL</key>
 	<string>https://github.com/mark2mark/Show-Rotated</string>
 	<key>productReleaseNotes</key>
-	<string>Update to new Plugin SDK</string>
+	<string>Rotation can be set via Context Menu</string>
 	<key>LSHasLocalizedDisplayName</key>
 	<false/>
 	<key>NSAppleScriptEnabled</key>
