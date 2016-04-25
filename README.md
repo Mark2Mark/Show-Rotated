@@ -21,19 +21,13 @@ When ever you need it, toggle `Show * Rotated` from the view menu.
 
 ### Examples
 
-<<<<<<< HEAD
 ![Show Rotated Demo](https://github.com/Mark2Mark/Glyphsapp-Plugins/blob/Screenshots/ShowRotated/Screenshots/ShowRotated-Mark-Froemberg-1200.png?raw=true "Show Rotated Demo")
 
 ![Show Rotated live Demo](https://github.com/Mark2Mark/Glyphsapp-Plugins/blob/Screenshots/ShowRotated/Screenshots/ShowRotated03_Mark-Froemberg.gif?raw=true "Show Rotated live Demo")
-=======
-![Show Rotated Demo](https://raw.githubusercontent.com/DeutschMark/Show-Rotated/master/Screenshots/Show%20Rotated%20-%20Mark%20-%20Froemberg%2001.png?raw=true "Show Rotated Demo")
 
-![Show Rotated live Demo](https://github.com/DeutschMark/Show-Rotated/blob/master/Screenshots/Show%20Rotated%20-%20Mark%20-%20Froemberg%2002.gif?raw=true "Show Rotated live Demo")
+![Show Rotated Demo](https://github.com/Mark2Mark/Show-Rotated/blob/master/Screenshots/Show%20Rotated%20-%20Mark%20-%20Froemberg%2003.png?raw=true "Show Rotated Demo")
 
-![Show Rotated Demo](https://github.com/DeutschMark/Show-Rotated/blob/master/Screenshots/Show%20Rotated%20-%20Mark%20-%20Froemberg%2003.png?raw=true "Show Rotated Demo")
-
-![Show Rotated Demo](https://github.com/DeutschMark/Show-Rotated/blob/master/Screenshots/Show%20Rotated%20-%20Mark%20-%20Froemberg%2004-png.png?raw=true "Show Rotated Demo")
->>>>>>> origin/master
+![Show Rotated Demo](https://github.com/Mark2Mark/Show-Rotated/blob/master/Screenshots/Show%20Rotated%20-%20Mark%20-%20Froemberg%2004-png.png?raw=true "Show Rotated Demo")
 
 
 ##### Known issues
