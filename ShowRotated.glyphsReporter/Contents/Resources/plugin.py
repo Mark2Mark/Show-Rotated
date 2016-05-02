@@ -80,6 +80,8 @@ class ShowRotated(ReporterPlugin):
 
 	def drawRotated( self, layer ):
 
+		# self.logToConsole( "Here is my log" )
+
 		Glyph = layer.parent
 		thisBezierPathWithComponent = self.bezierPathComp(layer.copyDecomposedLayer())
 		pathA = thisBezierPathWithComponent.copy()
@@ -121,7 +123,8 @@ class ShowRotated(ReporterPlugin):
 
 
 	def setRotationAngle(self):
-		print 'Just did something'
+		pass
+		# print 'Just did something'
 
 
 	# def conditionalContextMenus(self):
