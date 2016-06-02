@@ -23,6 +23,7 @@ class ShowRotated(ReporterPlugin):
 		###################################
 		## Rotation Slider for Context Menu:
 		self.name = 'Show Rotated'
+		self.flipH = 0
 
 		# Create Vanilla window and group with controls
 		viewWidth = 150
@@ -41,18 +42,23 @@ class ShowRotated(ReporterPlugin):
 
 		## Define the menu
 		self.generalContextMenus = [
-		    {"view": self.sliderMenuView.group.getNSView()}
+		    {"view": self.sliderMenuView.group.getNSView()},
+		    {"name": "Flip Horizonally", "action": self.flipHorizontally },
 		]
 		###################################
 
 
-		self.menuName = Glyphs.localize({'en': u'* Rotated', 'de': u'* Rotiert'}) #  ☯
+		self.menuName = Glyphs.localize({'en': u'* Rotated', 'de': u'* Rotiert'})
 		# self.generalContextMenus = [
 		# 	{'name': Glyphs.localize({'en': u'Rotation:', 'de': u'Rotation:'}), 'action': self.setRotationAngle},
 		# ]
 
 
-		
+
+	def flipHorizontally(self, sender):
+		try:
+			self.flipH = not self.flipH
+		except: pass
 
 	def background(self, layer):  # def foreground(self, layer):
 		NSColor.colorWithCalibratedRed_green_blue_alpha_( 0.0, 0.5, 0.3, 0.3 ).set()
@@ -101,9 +107,18 @@ class ShowRotated(ReporterPlugin):
 		# rotation.translateXBy_yBy_( -x, -y )
 
 		rotation.rotateByDegrees_( self.sliderMenuView.group.slider.get() )
-		rotation.translateXBy_yBy_( -x, -y )		
+		rotation.translateXBy_yBy_( -x, -y )
 
 		thisBezierPathWithComponent.transformUsingAffineTransform_( rotation )
+
+		try:
+			if self.flipH:
+				flipH = NSAffineTransform.transform()
+				flipH.translateXBy_yBy_( x, y )
+				flipH.scaleXBy_yBy_( -1, 1 )
+				flipH.translateXBy_yBy_( -x, -y )
+				thisBezierPathWithComponent.transformUsingAffineTransform_( flipH )
+		except: pass
 		
 		if thisBezierPathWithComponent:
 			thisBezierPathWithComponent.fill()
