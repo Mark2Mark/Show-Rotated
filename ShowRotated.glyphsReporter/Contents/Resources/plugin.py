@@ -19,9 +19,6 @@ from vanilla import *
 class ShowRotated(ReporterPlugin):
 
 	def settings(self):
-
-		###################################
-		## Rotation Slider for Context Menu:
 		self.name = 'Show Rotated'
 		self.flipH = 0
 
@@ -54,18 +51,15 @@ class ShowRotated(ReporterPlugin):
 		# ]
 
 
+	def sliderCallback(self, sender):
+		self.RefreshView()
+
 
 	def flipHorizontally(self, sender):
 		try:
 			self.flipH = not self.flipH
 		except: pass
 
-	def background(self, layer):  # def foreground(self, layer):
-		NSColor.colorWithCalibratedRed_green_blue_alpha_( 0.0, 0.5, 0.3, 0.3 ).set()
-		self.drawRotated( layer )
-
-	# def inactiveLayers(self, layer):
-	# 	pass
 
 	def rotationTransform( self, angle, center ):
 		try:
@@ -77,6 +71,7 @@ class ShowRotated(ReporterPlugin):
 		except Exception as e:
 			self.logToConsole( "rotationTransform: %s" % str(e) )
 
+
 	def bezierPathComp( self, thisPath ):
 		"""Compatibility method for bezierPath before v2.3."""
 		try:
@@ -84,10 +79,8 @@ class ShowRotated(ReporterPlugin):
 		except Exception as e:
 			return thisPath.bezierPath # v2.3+
 
+
 	def drawRotated( self, layer ):
-
-		# self.logToConsole( "Here is my log" )
-
 		Glyph = layer.parent
 		thisBezierPathWithComponent = self.bezierPathComp(layer.copyDecomposedLayer())
 		pathA = thisBezierPathWithComponent.copy()
@@ -98,17 +91,8 @@ class ShowRotated(ReporterPlugin):
 
 		rotation = NSAffineTransform.transform()
 		rotation.translateXBy_yBy_( x, y )
-
-		# if NSUserDefaults.standardUserDefaults().floatForKey_("TransformRotate") != 0:
-		# 	thisRotation = NSUserDefaults.standardUserDefaults().floatForKey_("TransformRotate")
-		# else:
-		# 	thisRotation = 180
-		# rotation.rotateByDegrees_( thisRotation )
-		# rotation.translateXBy_yBy_( -x, -y )
-
 		rotation.rotateByDegrees_( self.sliderMenuView.group.slider.get() )
 		rotation.translateXBy_yBy_( -x, -y )
-
 		thisBezierPathWithComponent.transformUsingAffineTransform_( rotation )
 
 		try:
@@ -135,33 +119,8 @@ class ShowRotated(ReporterPlugin):
 		# 	print "match"
 
 
-
-
 	def setRotationAngle(self):
 		pass
-		# print 'Just did something'
-
-
-	# def conditionalContextMenus(self):
-
-	# 	# Empty list of context menu items
-	# 	contextMenus = []
-
-	# 	# Execute only if layers are actually selected
-	# 	if Glyphs.font.selectedLayers:
-	# 		layer = Glyphs.font.selectedLayers[0]
-			
-	# 		# Exactly one object is selected and it’s an anchor
-	# 		if len(layer.selection) == 1 and type(layer.selection[0]) == GSAnchor:
-					
-	# 			# Add context menu item
-	# 			contextMenus.append({'name': Glyphs.localize({'en': u'Do something else', 'de': u'Tu etwas anderes'}), 'action': self.doSomethingElse})
-
-	# 	# Return list of context menu items
-	# 	return contextMenus
-
-	# def doSomethingElse(self):
-	# 	print 'Just did something else'
 
 
 	def RefreshView(self):
@@ -173,7 +132,8 @@ class ShowRotated(ReporterPlugin):
 		except:
 			pass
 
-	# Prints the slider’s value
-	def sliderCallback(self, sender):
-		# print 'Slider value:', sender.get()
-		self.RefreshView()
+
+	def background(self, layer):  # def foreground(self, layer):
+		NSColor.colorWithCalibratedRed_green_blue_alpha_( 0.0, 0.5, 0.3, 0.3 ).set()
+		self.drawRotated( layer )
+
