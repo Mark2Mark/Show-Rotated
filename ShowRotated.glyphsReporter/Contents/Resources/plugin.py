@@ -45,7 +45,7 @@ class ShowRotated(ReporterPlugin):
 		###################################
 
 
-		self.menuName = Glyphs.localize({'en': u'* Rotated', 'de': u'* Rotiert'})
+		self.menuName = Glyphs.localize({'en': u'Rotated', 'de': u'Rotiert'})
 		# self.generalContextMenus = [
 		# 	{'name': Glyphs.localize({'en': u'Rotation:', 'de': u'Rotation:'}), 'action': self.setRotationAngle},
 		# ]
