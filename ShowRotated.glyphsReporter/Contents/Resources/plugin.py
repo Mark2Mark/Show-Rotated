@@ -21,6 +21,10 @@ class ShowRotated(ReporterPlugin):
 	def settings(self):
 		self.name = 'Show Rotated'
 		self.flipH = 0
+		self.flipLabel = {
+			0 : "Flip Horizonally",
+			1 : "Unflip Horizonally"
+			}
 
 		# Create Vanilla window and group with controls
 		viewWidth = 150
@@ -39,13 +43,13 @@ class ShowRotated(ReporterPlugin):
 
 		## Define the menu
 		self.generalContextMenus = [
-		    {"view": self.sliderMenuView.group.getNSView()},
-		    {"name": "Flip Horizonally", "action": self.flipHorizontally },
+			{"view": self.sliderMenuView.group.getNSView()},
+			{"name": self.flipLabel[0], "action": self.flipHorizontally },
 		]
 		###################################
 
 
-		self.menuName = Glyphs.localize({'en': u'Rotated', 'de': u'Rotiert'})
+		self.menuName = Glyphs.localize({'en': u'Rotated ☯', 'de': u'Rotiert ☯'})
 		# self.generalContextMenus = [
 		# 	{'name': Glyphs.localize({'en': u'Rotation:', 'de': u'Rotation:'}), 'action': self.setRotationAngle},
 		# ]
@@ -58,6 +62,10 @@ class ShowRotated(ReporterPlugin):
 	def flipHorizontally(self, sender):
 		try:
 			self.flipH = not self.flipH
+			self.generalContextMenus = [
+		    	{"view": self.sliderMenuView.group.getNSView()},
+		    	{"name": self.flipLabel[self.flipH], "action": self.flipHorizontally },
+			]
 		except: pass
 
 
