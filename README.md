@@ -21,14 +21,14 @@ When ever you need it, toggle `Show * Rotated` from the view menu.
 
 ### Examples
 
-![Show Rotated live Demo]()
-
 <p align="center">
+
 <img src="https://github.com/Mark2Mark/Glyphsapp-Plugins/blob/Screenshots/ShowRotated/Screenshots/ShowRotated-Mark-Froemberg-1200.png" alt="Show Rotated Demo" height="300px">
 
 <img src="https://github.com/Mark2Mark/Glyphsapp-Plugins/blob/Screenshots/ShowRotated/Screenshots/ShowRotated03_Mark-Froemberg.gif" alt="o" height="300px">
 
 <img src="https://raw.githubusercontent.com/Mark2Mark/Show-Rotated/master/Screenshots/ShowRotatedFlipped.gif" alt="Show Rotated live Demo" height="300px">
+
 </p>
 
 ##### Known issues
