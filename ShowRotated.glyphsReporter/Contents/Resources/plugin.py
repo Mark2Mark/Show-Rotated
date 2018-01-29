@@ -13,13 +13,16 @@
 
 ### New names: Carroussel, ... (?)
 
+from GlyphsApp import GSLayer
 from GlyphsApp.plugins import *
 from vanilla import *
+
 
 class ShowRotated(ReporterPlugin):
 
 	def settings(self):
 		self.name = 'Show Rotated'
+		self.color = 0.0, 0.5, 0.3, 0.3
 		self.flipH = 0
 		self.flipLabel = {
 			0 : "Flip Horizonally",
@@ -89,9 +92,12 @@ class ShowRotated(ReporterPlugin):
 
 
 	def drawRotated( self, layer ):
+		#print layer.mutableCopy()#.correctPathDirection() # WHY does it return an ORPHAN?
 		Glyph = layer.parent
-		thisBezierPathWithComponent = self.bezierPathComp(layer.copyDecomposedLayer())
+		#thisBezierPathWithComponent = self.bezierPathComp(layer.copyDecomposedLayer())
+		thisBezierPathWithComponent = layer.completeBezierPath
 		pathA = thisBezierPathWithComponent.copy()
+		
 
 		bounds = layer.bounds
 		x = bounds.origin.x + 0.5 * bounds.size.width
@@ -114,6 +120,18 @@ class ShowRotated(ReporterPlugin):
 		
 		if thisBezierPathWithComponent:
 			thisBezierPathWithComponent.fill()
+	
+			'''
+			vLayer = GSLayer.alloc().init()
+			vLayer.addPath_(thisBezierPathWithComponent)
+			#print vLayer.paths#.correctPathDirection()
+			((x1, y1), (w1, h1)) = thisBezierPathWithComponent.controlPointBounds()
+			((x2, y2), (w2, h2)) = layer.completeBezierPath.controlPointBounds()
+			if int(x1) == int(x2):
+				self.color = 0.8, 0.5, 0.3, 0.3
+			else: 
+				self.color = 0.0, 0.5, 0.3, 0.3
+			'''
 
 		## UNDER CONSTRUCTION:
 		## HIGHTLIGHT IF BOTH PATHS PERFECTLY MATCH
@@ -142,6 +160,6 @@ class ShowRotated(ReporterPlugin):
 
 
 	def background(self, layer):  # def foreground(self, layer):
-		NSColor.colorWithCalibratedRed_green_blue_alpha_( 0.0, 0.5, 0.3, 0.3 ).set()
+		NSColor.colorWithCalibratedRed_green_blue_alpha_( *self.color ).set()
 		self.drawRotated( layer )
 
