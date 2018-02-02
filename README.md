@@ -7,17 +7,12 @@
 *This is a plugin for the [Glyphs font editor](http://glyphsapp.com/).*  
 
 It superimposes the current glyph as a rotated copy of itself.  
-If you enter a rotation value in the `Transformations Palette`, this plugin will resemble that very value. If it is `0` or `None`, the rotation will be exactly `180°`.  
 This can be helpful when working on symmetric characters (e.g. `0, O, o, S, s, Z, z, X, x, …`). The degree of a desired match depends on each design, of course. It is not nessessary to match the drawing with it’s rotated counterpart, but it can indeed help to balance letters in matters of weight distribution and/or optical centering.
 
 ### Install
 
-1. Download or clone this repository.
-2. Either:  
-   Double click the `.glyphsReporter` file and confirm the dialogue in Glyphsapp to install.  
-   Or:  
-   Copy the `.glyphsReporter` into your Glyphsapp Plugins folder (eg. `/Library/Application\ Support/Glyphs/Plugins`). You can use subfolders (e.g. to sort plugins by author) there.
-3. Restart Glyphs.
+1. Install via the Plugin Manager in GLyphs.
+2. Restart Glyphs.
 
 ### How to use
 
@@ -26,8 +21,6 @@ When ever you need it, toggle `Show * Rotated` from the view menu.
 ### Examples
 
 <p align="center">
-
-<img src="https://github.com/Mark2Mark/Glyphsapp-Plugins/blob/Screenshots/ShowRotated/Screenshots/ShowRotated-Mark-Froemberg-1200.png" alt="Show Rotated Demo" height="300px">
 
 <img src="https://github.com/Mark2Mark/Glyphsapp-Plugins/blob/Screenshots/ShowRotated/Screenshots/ShowRotated03_Mark-Froemberg.gif" alt="o" height="300px">
 
