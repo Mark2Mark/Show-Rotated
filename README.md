@@ -11,7 +11,7 @@ This can be helpful when working on symmetric characters (e.g. `0, O, o, S, s, Z
 
 ### Install
 
-1. Install via the Plugin Manager in GLyphs.
+1. Install via the Plugin Manager in Glyphs.
 2. Restart Glyphs.
 
 ### How to use
