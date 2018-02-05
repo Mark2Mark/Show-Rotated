@@ -24,7 +24,7 @@ When ever you need it, toggle `Show * Rotated` from the view menu.
 
 <img src="https://github.com/Mark2Mark/Glyphsapp-Plugins/blob/Screenshots/ShowRotated/Screenshots/ShowRotated03_Mark-Froemberg.gif" alt="o" height="300px">
 
-<img src="https://raw.githubusercontent.com/Mark2Mark/Show-Rotated/master/Screenshots/ShowRotatedFlipped.gif" alt="Show Rotated live Demo" height="300px">
+<img src="https://raw.githubusercontent.com/Mark2Mark/Show-Rotated/master/Images/ShowRotatedFlipped.gif" alt="Show Rotated live Demo" height="300px">
 
 </p>
 
