@@ -21,7 +21,7 @@
 	<key>CFBundleVersion</key>
 	<string>1.2</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.2.1</string>
+	<string>1.2.2</string>
 	<key>UpdateFeedURL</key>
 	<string>https://raw.githubusercontent.com/mark2mark/Show-Rotated/master/ShowRotated.glyphsReporter/Contents/Info.plist</string>
 	<key>productPageURL</key>

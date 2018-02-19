@@ -22,54 +22,38 @@ class ShowRotated(ReporterPlugin):
 
 	def settings(self):
 		self.name = 'Show Rotated'
+		self.thisMenuTitle = {"name": u"%s:" % self.name, "action": None }
 		self.color = 0.0, 0.5, 0.3, 0.3
 		self.flipH = 0
-		self.flipLabel = {
-			0 : "Flip Horizonally",
-			1 : "Unflip Horizonally"
-			}
+
 
 		# Create Vanilla window and group with controls
-		viewWidth = 150
-		viewHeight = 70
+		viewWidth = 170
+		viewHeight = 28 + 25 + 25
 		self.sliderMenuView = Window((viewWidth, viewHeight))
 		self.sliderMenuView.group = Group((0, 0, viewWidth, viewHeight)) # (0, 0, viewWidth, viewHeight)
-		self.sliderMenuView.group.line = HorizontalLine((10, 10, -10, 1))
-		self.sliderMenuView.group.text = TextBox((10, 20, -10, -10), self.name)
-		self.sliderMenuView.group.slider = Slider((10, 38, -10, 23),
+		self.sliderMenuView.group.slider = Slider((20, 0, -1, 25),
                             tickMarkCount = 17,
                             maxValue = 360,
                             stopOnTickMarks = True,
                             continuous = True,
                             callback=self.sliderCallback)
 		self.sliderMenuView.group.slider.set(180)
+		self.sliderMenuView.group.checkboxH = CheckBox((20, 28, -1, 25), "Flip Horizontally", callback=self.RefreshView)
+		self.sliderMenuView.group.checkboxV = CheckBox((20, 48, -1, 25), "Flip Vertically", callback=self.RefreshView)
 
 		## Define the menu
 		self.generalContextMenus = [
+		self.thisMenuTitle,
 			{"view": self.sliderMenuView.group.getNSView()},
-			{"name": self.flipLabel[0], "action": self.flipHorizontally },
 		]
 		###################################
 
-
 		self.menuName = Glyphs.localize({'en': u'Rotated ☯', 'de': u'Rotiert ☯'})
-		# self.generalContextMenus = [
-		# 	{'name': Glyphs.localize({'en': u'Rotation:', 'de': u'Rotation:'}), 'action': self.setRotationAngle},
-		# ]
 
 
 	def sliderCallback(self, sender):
-		self.RefreshView()
-
-
-	def flipHorizontally(self, sender):
-		try:
-			self.flipH = not self.flipH
-			self.generalContextMenus = [
-		    	{"view": self.sliderMenuView.group.getNSView()},
-		    	{"name": self.flipLabel[self.flipH], "action": self.flipHorizontally },
-			]
-		except: pass
+		self.RefreshView(sender)
 
 
 	def rotationTransform( self, angle, center ):
@@ -110,46 +94,30 @@ class ShowRotated(ReporterPlugin):
 		thisBezierPathWithComponent.transformUsingAffineTransform_( rotation )
 
 		try:
-			if self.flipH:
+			if self.sliderMenuView.group.checkboxH.get() == True:
 				flipH = NSAffineTransform.transform()
 				flipH.translateXBy_yBy_( x, y )
 				flipH.scaleXBy_yBy_( -1, 1 )
 				flipH.translateXBy_yBy_( -x, -y )
 				thisBezierPathWithComponent.transformUsingAffineTransform_( flipH )
+			if self.sliderMenuView.group.checkboxV.get() == True:
+				flipV = NSAffineTransform.transform()
+				flipV.translateXBy_yBy_( x, y )
+				flipV.scaleXBy_yBy_( 1, -1 )
+				flipV.translateXBy_yBy_( -x, -y )
+				thisBezierPathWithComponent.transformUsingAffineTransform_( flipV )
+
 		except: pass
 		
 		if thisBezierPathWithComponent:
 			thisBezierPathWithComponent.fill()
 	
-			'''
-			vLayer = GSLayer.alloc().init()
-			vLayer.addPath_(thisBezierPathWithComponent)
-			#print vLayer.paths#.correctPathDirection()
-			((x1, y1), (w1, h1)) = thisBezierPathWithComponent.controlPointBounds()
-			((x2, y2), (w2, h2)) = layer.completeBezierPath.controlPointBounds()
-			if int(x1) == int(x2):
-				self.color = 0.8, 0.5, 0.3, 0.3
-			else: 
-				self.color = 0.0, 0.5, 0.3, 0.3
-			'''
-
-		## UNDER CONSTRUCTION:
-		## HIGHTLIGHT IF BOTH PATHS PERFECTLY MATCH
-		# pathAStringRepresentation = "%s" % pathA.CGPath
-		# thisBezierPathWithComponentStringRepresentation = "%s" % thisBezierPathWithComponent.CGPath
-		# AAA = '\n'.join(pathAStringRepresentation.split('\n')[1:])
-		# BBB = '\n'.join(thisBezierPathWithComponentStringRepresentation.split('\n')[1:])
-		# print AAA
-		# print BBB
-		# if AAA == BBB:
-		# 	print "match"
-
 
 	def setRotationAngle(self):
 		pass
 
 
-	def RefreshView(self):
+	def RefreshView(self, sender):
 		try:
 			Glyphs = NSApplication.sharedApplication()
 			currentTabView = Glyphs.font.currentTab
