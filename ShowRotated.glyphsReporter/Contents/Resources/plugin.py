@@ -33,18 +33,18 @@ class ShowRotated(ReporterPlugin):
 		self.sliderMenuView = Window((viewWidth, viewHeight))
 		self.sliderMenuView.group = Group((0, 0, viewWidth, viewHeight)) # (0, 0, viewWidth, viewHeight)
 		self.sliderMenuView.group.slider = Slider((20, 0, -1, 25),
-                            tickMarkCount = 17,
-                            maxValue = 360,
-                            stopOnTickMarks = True,
-                            continuous = True,
-                            callback=self.sliderCallback)
+							tickMarkCount = 17,
+							maxValue = 360,
+							stopOnTickMarks = True,
+							continuous = True,
+							callback=self.sliderCallback)
 		self.sliderMenuView.group.slider.set(180)
 		self.sliderMenuView.group.checkboxH = CheckBox((20, 28, -1, 25), "Flip Horizontally", callback=self.RefreshView)
 		self.sliderMenuView.group.checkboxV = CheckBox((20, 48, -1, 25), "Flip Vertically", callback=self.RefreshView)
 
 		## Define the menu
 		self.generalContextMenus = [
-		self.thisMenuTitle,
+			self.thisMenuTitle,
 			{"view": self.sliderMenuView.group.getNSView()},
 		]
 		###################################
