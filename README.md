@@ -22,7 +22,7 @@ When ever you need it, toggle `Show * Rotated` from the view menu.
 
 <p align="center">
 
-<img src="https://raw.githubusercontent.com/Mark2Mark/Show-Rotated/master/Images/ShowRotated%2002.gif" alt="o" height="300px">
+<img src="https://raw.githubusercontent.com/Mark2Mark/Show-Rotated/master/Images/ShowRotated%2002.gif" alt="show rotated">
 
 
 
