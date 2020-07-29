@@ -49,7 +49,7 @@ class ShowRotated(ReporterPlugin):
 		]
 		###################################
 
-		self.menuName = Glyphs.localize({'en': u'Rotated ☯', 'de': u'Rotiert ☯'})
+		self.menuName = Glyphs.localize({'en': u'Rotated', 'de': u'Rotiert'}) # ☯
 
 	def sliderCallback_(self, sender):
 		self.RefreshView_(sender)
