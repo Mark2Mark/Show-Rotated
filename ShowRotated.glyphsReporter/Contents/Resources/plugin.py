@@ -28,6 +28,7 @@ from AppKit import (
     NSColor,
     NSMakeRect,
     NSZeroRect,
+    NSUserDefaults,
 )
 import traceback
 
@@ -240,3 +241,8 @@ class ShowRotated(ReporterPlugin):
     def background(self, layer):  # def foreground(self, layer):
         NSColor.colorWithCalibratedRed_green_blue_alpha_(*self.color).set()
         self.draw_rotated(layer)
+
+    def needsExtraMainOutlineDrawingInPreviewLayer_(self, layer):
+        return False
+
+    def drawForegroundInPreviewLayer_options_(self, layer, options):
