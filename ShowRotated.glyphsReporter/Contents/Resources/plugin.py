@@ -29,6 +29,12 @@ from AppKit import (
     NSMakeRect,
     NSZeroRect,
     NSUserDefaults,
+    NSString,
+    NSMutableParagraphStyle,
+    NSCenterTextAlignment,
+    NSFontAttributeName,
+    NSParagraphStyleAttributeName,
+    NSFontWeightBold,
 )
 import traceback
 
@@ -246,3 +252,74 @@ class ShowRotated(ReporterPlugin):
         return False
 
     def drawForegroundInPreviewLayer_options_(self, layer, options):
+        is_black = NSUserDefaults.standardUserDefaults().boolForKey_("GSPreview_Black")
+
+        base_position_transform = NSAffineTransform.transform()
+        padding = 100
+
+        paragraph_style = NSMutableParagraphStyle.alloc().init()
+        paragraph_style.setAlignment_(NSCenterTextAlignment)
+        string_attributes = {
+            NSFontAttributeName: NSFont.systemFontOfSize_weight_(80, NSFontWeightBold),
+            NSForegroundColorAttributeName: NSColor.redColor(),
+            NSParagraphStyleAttributeName: paragraph_style,
+        }
+        label_height = 100
+
+        for i in range(8):
+            rotation_transform = NSAffineTransform.transform()
+            layer_path = layer.completeBezierPath.copy()
+            if not layer_path:
+                return
+
+            try:
+                rotation_degrees = 90 * i
+                # TODO: refactor this bounds code. Used in several spots now.
+                bounds = layer.bounds
+
+                x = bounds.origin.x + 0.5 * bounds.size.width
+                y = bounds.origin.y + 0.5 * bounds.size.height
+
+                label = NSString.stringWithString_(
+                    f"{rotation_degrees % 360}° {'↔' if i > 3 else ''}"
+                )
+                label.drawInRect_withAttributes_(
+                    NSRect(
+                        (
+                            base_position_transform.transformStruct().tX - padding / 2,
+                            layer.descender - label_height,
+                        ),
+                        # (NSWidth(bounds) + padding, label_height),
+                        (layer.width + padding, label_height),
+                    ),
+                    string_attributes,
+                )
+
+                rotation_transform.translateXBy_yBy_(x, y)
+                if i > 3:
+                    rotation_transform.scaleXBy_yBy_(-1, 1)
+                rotation_transform.rotateByDegrees_(rotation_degrees)
+                rotation_transform.translateXBy_yBy_(-x, -y)
+
+                combined_transform = NSAffineTransform.transform()
+                combined_transform.appendTransform_(rotation_transform)
+                combined_transform.appendTransform_(base_position_transform)
+
+                layer_path.transformUsingAffineTransform_(combined_transform)
+
+                if is_black:
+                    NSColor.whiteColor().set()
+                else:
+                    NSColor.blackColor().set()
+
+                layer_path.fill()
+
+                # base_position_transform.translateXBy_yBy_(layer.width + padding, 0)
+                base_position_transform.translateXBy_yBy_(
+                    max(NSWidth(bounds), NSHeight(bounds)) + padding, 0
+                )
+                # layer_path_bounds = layer_path.bounds()
+                # base_position_transform.translateXBy_yBy_(NSWidth(layer_path_bounds), 0)
+
+            except:
+                print(traceback.format_exc())
