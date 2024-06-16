@@ -151,6 +151,7 @@ class ShowRotated(ReporterPlugin):
             button.cell().setImagePosition_(NSImageOnly)
             button.cell().setImageScaling_(NSImageScaleNone)
             button.setImage_(self.toolBarIcon)
+            button.setToolTip_(self.menuName)
             tab.addViewToBottomToolbar_(button)
             try:
                 tab.tempData["rotationsButton"] = button  # Glyphs 3
