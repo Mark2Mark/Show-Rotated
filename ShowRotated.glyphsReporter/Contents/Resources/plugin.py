@@ -255,6 +255,7 @@ class ShowRotated(ReporterPlugin):
             return
 
         try:
+            NSColor.colorWithCalibratedRed_green_blue_alpha_(*self.color).set()
             bounds = bezier_path.bounds()
             if self.slider_menu_view.group.checkbox_selection_mode.get():
                 selected_paths = NSBezierPath.alloc().init()
@@ -381,7 +382,6 @@ class ShowRotated(ReporterPlugin):
     @objc.python_method
     def background(self, layer):  # def foreground(self, layer):
         if Glyphs.boolDefaults[KEY_SUPERIMPOSED]:
-            NSColor.colorWithCalibratedRed_green_blue_alpha_(*self.color).set()
             self.draw_rotated(layer)
 
     def needsExtraMainOutlineDrawingInPreviewLayer_(self, layer):
