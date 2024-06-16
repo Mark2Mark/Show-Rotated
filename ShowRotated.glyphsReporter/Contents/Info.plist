@@ -13,9 +13,9 @@
 	<key>CFBundleName</key>
 	<string>Show Rotated</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.3.3</string>
+	<string>1.3.4</string>
 	<key>CFBundleVersion</key>
-	<string>19</string>
+	<string>20</string>
 	<key>UpdateFeedURL</key>
 	<string>https://raw.githubusercontent.com/mark2mark/Show-Rotated/master/ShowRotated.glyphsReporter/Contents/Info.plist</string>
 	<key>productPageURL</key>
