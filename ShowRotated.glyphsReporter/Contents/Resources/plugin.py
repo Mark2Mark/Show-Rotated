@@ -74,13 +74,13 @@ class ShowRotated(ReporterPlugin):
     @objc.python_method
     def settings(self):
         self.name = "Rotated"
-        self.menu_title = {"name": "%s:" % self.name, "action": None}
         self.color = 0.0, 0.5, 0.3, 0.3
-        self.flip_h_transform = 0
+        self.menuName = Glyphs.localize({"en": "Rotated", "de": "Rotiert"})
+        self.setup_ui()
 
-        # Create Vanilla window and group with controls
+    def setup_ui(self):
         view_width = 170
-        view_height = 28 + 25 + 25 + 25
+        view_height = 103
         self.slider_menu_view = Window((view_width, view_height))
         self.slider_menu_view.group = Group((0, 0, view_width, view_height))
         self.slider_menu_view.group.slider = Slider(
@@ -92,7 +92,6 @@ class ShowRotated(ReporterPlugin):
             callback=self.update,
         )
         self.slider_menu_view.group.slider.set(180)
-
         self.slider_menu_view.group.horizontal = CheckBox(
             (20, 28, -1, 25), "Flip Horizontally", callback=self.update
         )
@@ -102,14 +101,10 @@ class ShowRotated(ReporterPlugin):
         self.slider_menu_view.group.checkbox_selection_mode = CheckBox(
             (20, 68, -1, 25), "Rotate Selection", callback=self.update
         )
-
         self.generalContextMenus = [
-            self.menu_title,
+            {"name": "%s:" % self.name, "action": None},
             {"view": self.slider_menu_view.group.getNSView()},
         ]
-        ###################################
-
-        self.menuName = Glyphs.localize({"en": "Rotated", "de": "Rotiert"})
 
     @objc.python_method
     def start(self):
