@@ -183,13 +183,13 @@ class ShowRotated(ReporterPlugin):
                 tab.graphicView(), f"values.{KEY_ROTATIONSBUTTON}"
             )
 
-    @objc.python_method
-    def rotation_transform(self, angle, center):
-        rotation = NSAffineTransform.transform()
-        rotation.translateXBy_yBy_(center.x, center.y)
-        rotation.rotateByDegrees_(angle)
-        rotation.translateXBy_yBy_(-center.x, -center.y)
-        return rotation
+    # @objc.python_method
+    # def rotation_transform(self, angle, center):
+    #     rotation = NSAffineTransform.transform()
+    #     rotation.translateXBy_yBy_(center.x, center.y)
+    #     rotation.rotateByDegrees_(angle)
+    #     rotation.translateXBy_yBy_(-center.x, -center.y)
+    #     return rotation
 
     @objc.python_method
     def rotation(self, x, y, angle):
@@ -339,10 +339,7 @@ class ShowRotated(ReporterPlugin):
         self.draw_rotated(layer)
 
     def needsExtraMainOutlineDrawingInPreviewLayer_(self, layer):
-        if Glyphs.boolDefaults[KEY_ROTATIONSBUTTON]:
-            return False
-        else:
-            return True
+        return not Glyphs.boolDefaults[KEY_ROTATIONSBUTTON]
 
     def drawForegroundInPreviewLayer_options_(self, layer, options):
         if not Glyphs.boolDefaults[KEY_ROTATIONSBUTTON]:
@@ -372,9 +369,7 @@ class ShowRotated(ReporterPlugin):
                 rotation_degrees = 90 * i
                 # TODO: refactor this bounds code. Used in several spots now.
                 bounds = layer.bounds
-
-                x = bounds.origin.x + 0.5 * bounds.size.width
-                y = bounds.origin.y + 0.5 * bounds.size.height
+                x, y = self.get_center(bounds)
 
                 label = NSString.stringWithString_(
                     f"{rotation_degrees % 360}° {'↔' if i > 3 else ''}"
