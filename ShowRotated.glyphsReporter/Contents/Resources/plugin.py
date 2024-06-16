@@ -14,7 +14,7 @@
 from GlyphsApp import GSPath, objcObject, TABDIDOPEN, TABWILLCLOSE, Glyphs
 from GlyphsApp.plugins import ReporterPlugin, pathForResource, objc
 from vanilla import Window, Slider, Group, CheckBox  # type: ignore
-
+from typing import List, Optional
 
 # ------------------
 # Shut up Pylance
@@ -68,6 +68,10 @@ import traceback
 # 	+ Add Center of Rotation
 
 KEY_ROTATIONSBUTTON = "com_markfromberg_showRotations"
+KEY_FLIPPED_HORIZONTAL = "com_markfromberg_showRotated_flip_horizontal"
+KEY_FLIPPED_VERTICAL = "com_markfromberg_showRotated_flip_vertical"
+KEY_ONLY_SELECTION = "com_markfromberg_showRotated_only_selection"
+KEY_SUPERIMPOSED = "com_markfromberg_showRotated_superimposed"
 
 
 class ShowRotated(ReporterPlugin):
@@ -100,10 +104,11 @@ class ShowRotated(ReporterPlugin):
         self.button = NSButton.alloc().initWithFrame_(NSMakeRect(0, 0, 18, 14))
 
         self.setup_ui()
+        self.setup_defaults()
 
     def setup_ui(self):
         view_width = 170
-        view_height = 103
+        view_height = 123
         self.slider_menu_view = Window((view_width, view_height))
         self.slider_menu_view.group = Group((0, 0, view_width, view_height))
         self.slider_menu_view.group.slider = Slider(
@@ -122,12 +127,39 @@ class ShowRotated(ReporterPlugin):
             (20, 48, -1, 25), "Flip Vertically", callback=self.update
         )
         self.slider_menu_view.group.checkbox_selection_mode = CheckBox(
-            (20, 68, -1, 25), "Rotate Selection", callback=self.update
+            (20, 68, -1, 25), "Rotate Selection Only", callback=self.update
+        )
+        self.slider_menu_view.group.checkbox_superimposed = CheckBox(
+            (20, 88, -1, 25), "Superimpose in Layer", callback=self.update
         )
         self.generalContextMenus = [
             {"name": "%s:" % self.name, "action": None},
             {"view": self.slider_menu_view.group.getNSView()},
         ]
+
+    def setup_defaults(self):
+        """Assumes that the UI is set up by now"""
+        userDefaults = NSUserDefaultsController.sharedUserDefaultsController()
+        userDefaults.defaults().registerDefaults_(
+            {
+                KEY_FLIPPED_HORIZONTAL: False,
+                KEY_FLIPPED_VERTICAL: False,
+                KEY_ONLY_SELECTION: False,
+                KEY_SUPERIMPOSED: True,
+            }
+        )
+        self.slider_menu_view.group.horizontal.getNSButton().bind_toObject_withKeyPath_options_(
+            "value", userDefaults, objcObject(f"values.{KEY_FLIPPED_HORIZONTAL}"), None
+        )
+        self.slider_menu_view.group.vertical.getNSButton().bind_toObject_withKeyPath_options_(
+            "value", userDefaults, objcObject(f"values.{KEY_FLIPPED_VERTICAL}"), None
+        )
+        self.slider_menu_view.group.checkbox_selection_mode.getNSButton().bind_toObject_withKeyPath_options_(
+            "value", userDefaults, objcObject(f"values.{KEY_ONLY_SELECTION}"), None
+        )
+        self.slider_menu_view.group.checkbox_superimposed.getNSButton().bind_toObject_withKeyPath_options_(
+            "value", userDefaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
+        )
 
     @objc.python_method
     def start(self):
@@ -207,10 +239,13 @@ class ShowRotated(ReporterPlugin):
         return rotation
 
     @objc.python_method
-    def selected_paths(self, layer):
-        # fmt: off
-        return [shape for shape in layer.selectedObjects()["shapes"] if isinstance(shape, GSPath)]
-        # fmt: on
+    def selected_paths(self, layer) -> Optional[List[GSPath]]:
+        try:
+            # fmt: off
+            return [shape for shape in layer.selectedObjects()["shapes"] if isinstance(shape, GSPath)]
+            # fmt: on
+        except:
+            return None
 
     @objc.python_method
     def draw_rotated(self, layer):
@@ -223,7 +258,10 @@ class ShowRotated(ReporterPlugin):
             bounds = bezier_path.bounds()
             if self.slider_menu_view.group.checkbox_selection_mode.get():
                 selected_paths = NSBezierPath.alloc().init()
-                for p in self.selected_paths(layer):
+                layer_paths_selected = self.selected_paths(layer)
+                if not layer_paths_selected:
+                    return
+                for p in layer_paths_selected:
                     selected_paths.appendBezierPath_(p.bezierPath)
                 bezier_path = selected_paths
                 bounds = selected_paths.bounds()
@@ -342,8 +380,9 @@ class ShowRotated(ReporterPlugin):
 
     @objc.python_method
     def background(self, layer):  # def foreground(self, layer):
-        NSColor.colorWithCalibratedRed_green_blue_alpha_(*self.color).set()
-        self.draw_rotated(layer)
+        if Glyphs.boolDefaults[KEY_SUPERIMPOSED]:
+            NSColor.colorWithCalibratedRed_green_blue_alpha_(*self.color).set()
+            self.draw_rotated(layer)
 
     def needsExtraMainOutlineDrawingInPreviewLayer_(self, layer):
         return not Glyphs.boolDefaults[KEY_ROTATIONSBUTTON]
