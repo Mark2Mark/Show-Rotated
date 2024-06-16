@@ -11,10 +11,8 @@
 #
 ###########################################################################################################
 
-from GlyphsApp import *
-from GlyphsApp import GSPath, objcObject
-from GlyphsApp.plugins import *
-from GlyphsApp.plugins import pathForResource
+from GlyphsApp import GSPath, objcObject, TABDIDOPEN, TABWILLCLOSE, Glyphs
+from GlyphsApp.plugins import ReporterPlugin, pathForResource, objc
 from vanilla import Window, Slider, Group, CheckBox  # type: ignore
 
 
@@ -29,7 +27,7 @@ Glyphs: Any = Glyphs
 from AppKit import (
     NSBezierPath,  # type: ignore
     NSMaxX,  # type: ignore
-    NSMidX,  # type: ignore
+    NSImage,  # type: ignore
     NSMinX,  # type: ignore
     NSMaxY,  # type: ignore
     NSMidY,  # type: ignore
@@ -38,18 +36,23 @@ from AppKit import (
     NSWidth,  # type: ignore
     NSGradient,  # type: ignore
     NSColor,  # type: ignore
+    NSFont,  # type: ignore
     NSMakeRect,  # type: ignore
     NSZeroRect,  # type: ignore
     NSUserDefaults,  # type: ignore
     NSString,  # type: ignore
     NSMutableParagraphStyle,  # type: ignore
+    NSAffineTransform,  # type: ignore
     NSCenterTextAlignment,  # type: ignore
     NSFontAttributeName,  # type: ignore
     NSParagraphStyleAttributeName,  # type: ignore
+    NSForegroundColorAttributeName,  # type: ignore
+    NSApplication,  # type: ignore
     NSFontWeightBold,  # type: ignore
     NSNotificationCenter,  # type: ignore
     NSUserDefaultsController,  # type: ignore
     NSButton,  # type: ignore
+    NSRect,  # type: ignore
     NSTexturedRoundedBezelStyle,  # type: ignore
     NSToggleButton,  # type: ignore
     NSImageOnly,  # type: ignore
