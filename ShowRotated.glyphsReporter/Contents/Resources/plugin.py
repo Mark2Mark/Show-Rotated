@@ -97,6 +97,7 @@ class ShowRotated(ReporterPlugin):
             }
         )
         self.name = self.menuName
+        self.button = NSButton.alloc().initWithFrame_(NSMakeRect(0, 0, 18, 14))
 
         self.setup_ui()
 
@@ -143,22 +144,21 @@ class ShowRotated(ReporterPlugin):
     def addRotationsButton_(self, notification):
         tab = notification.object()
         if hasattr(tab, "addViewToBottomToolbar_"):
-            button = NSButton.alloc().initWithFrame_(NSMakeRect(0, 0, 18, 14))
-            button.setBezelStyle_(NSTexturedRoundedBezelStyle)
-            button.setBordered_(False)
-            button.setButtonType_(NSToggleButton)
-            button.setTitle_("")
-            button.cell().setImagePosition_(NSImageOnly)
-            button.cell().setImageScaling_(NSImageScaleNone)
-            button.setImage_(self.toolBarIcon)
-            button.setToolTip_(self.menuName)
-            tab.addViewToBottomToolbar_(button)
+            self.button.setBezelStyle_(NSTexturedRoundedBezelStyle)
+            self.button.setBordered_(False)
+            self.button.setButtonType_(NSToggleButton)
+            self.button.setTitle_("")
+            self.button.cell().setImagePosition_(NSImageOnly)
+            self.button.cell().setImageScaling_(NSImageScaleNone)
+            self.button.setImage_(self.toolBarIcon)
+            self.button.setToolTip_(self.menuName)
+            tab.addViewToBottomToolbar_(self.button)
             try:
-                tab.tempData["rotationsButton"] = button  # Glyphs 3
+                tab.tempData["rotationsButton"] = self.button  # Glyphs 3
             except:
-                tab.userData["rotationsButton"] = button  # Glyphs 2
+                tab.userData["rotationsButton"] = self.button  # Glyphs 2
             userDefaults = NSUserDefaultsController.sharedUserDefaultsController()
-            button.bind_toObject_withKeyPath_options_(
+            self.button.bind_toObject_withKeyPath_options_(
                 "value",
                 userDefaults,
                 objcObject(f"values.{KEY_ROTATIONSBUTTON}"),
@@ -174,11 +174,11 @@ class ShowRotated(ReporterPlugin):
     def removeRotationsButton_(self, notification):
         tab = notification.object()
         try:
-            button = tab.tempData["rotationsButton"]  # Glyphs 3
+            self.button = tab.tempData["rotationsButton"]  # Glyphs 3
         except:
-            button = tab.userData["rotationsButton"]  # Glyphs 2
-        if button != None:
-            button.unbind_("value")
+            self.button = tab.userData["rotationsButton"]  # Glyphs 2
+        if self.button != None:
+            self.button.unbind_("value")
             userDefaults = NSUserDefaultsController.sharedUserDefaultsController()
             userDefaults.removeObserver_forKeyPath_(
                 tab.graphicView(), f"values.{KEY_ROTATIONSBUTTON}"
@@ -191,6 +191,12 @@ class ShowRotated(ReporterPlugin):
     #     rotation.rotateByDegrees_(angle)
     #     rotation.translateXBy_yBy_(-center.x, -center.y)
     #     return rotation
+
+    def willActivate(self):
+        self.button.setHidden_(False)
+
+    def willDeactivate(self):
+        self.button.setHidden_(True)
 
     @objc.python_method
     def rotation(self, x, y, angle):
