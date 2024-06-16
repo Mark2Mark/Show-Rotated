@@ -73,7 +73,6 @@ KEY_ROTATIONSBUTTON = "com_markfromberg_showRotations"
 class ShowRotated(ReporterPlugin):
     @objc.python_method
     def settings(self):
-        self.name = "Rotated"
         self.color = 0.0, 0.5, 0.3, 0.3
         self.menuName = Glyphs.localize(
             {
@@ -97,6 +96,7 @@ class ShowRotated(ReporterPlugin):
                 "vi": "Xoay",
             }
         )
+        self.name = self.menuName
 
         self.setup_ui()
 
@@ -136,16 +136,13 @@ class ShowRotated(ReporterPlugin):
         NSNotificationCenter.defaultCenter().addObserver_selector_name_object_(
             self, "removeRotationsButton:", TABWILLCLOSE, objc.nil
         )
-
-        # load icon from bundle
-        # iconPath = pathForResource("underLineTemplate", "pdf", __file__)
         iconPath = pathForResource("rotatedIcon", "pdf", __file__)
         self.toolBarIcon = NSImage.alloc().initWithContentsOfFile_(iconPath)
         self.toolBarIcon.setTemplate_(True)
 
     def addRotationsButton_(self, notification):
-        Tab = notification.object()
-        if hasattr(Tab, "addViewToBottomToolbar_"):
+        tab = notification.object()
+        if hasattr(tab, "addViewToBottomToolbar_"):
             button = NSButton.alloc().initWithFrame_(NSMakeRect(0, 0, 18, 14))
             button.setBezelStyle_(NSTexturedRoundedBezelStyle)
             button.setBordered_(False)
@@ -154,11 +151,11 @@ class ShowRotated(ReporterPlugin):
             button.cell().setImagePosition_(NSImageOnly)
             button.cell().setImageScaling_(NSImageScaleNone)
             button.setImage_(self.toolBarIcon)
-            Tab.addViewToBottomToolbar_(button)
+            tab.addViewToBottomToolbar_(button)
             try:
-                Tab.tempData["rotationsButton"] = button  # Glyphs 3
+                tab.tempData["rotationsButton"] = button  # Glyphs 3
             except:
-                Tab.userData["rotationsButton"] = button  # Glyphs 2
+                tab.userData["rotationsButton"] = button  # Glyphs 2
             userDefaults = NSUserDefaultsController.sharedUserDefaultsController()
             button.bind_toObject_withKeyPath_options_(
                 "value",
@@ -167,35 +164,32 @@ class ShowRotated(ReporterPlugin):
                 None,
             )
             userDefaults.addObserver_forKeyPath_options_context_(
-                Tab.graphicView(),
+                tab.graphicView(),
                 objcObject(f"values.{KEY_ROTATIONSBUTTON}"),
                 0,
                 123,
             )
 
     def removeRotationsButton_(self, notification):
-        Tab = notification.object()
+        tab = notification.object()
         try:
-            button = Tab.tempData["rotationsButton"]  # Glyphs 3
+            button = tab.tempData["rotationsButton"]  # Glyphs 3
         except:
-            button = Tab.userData["rotationsButton"]  # Glyphs 2
+            button = tab.userData["rotationsButton"]  # Glyphs 2
         if button != None:
             button.unbind_("value")
             userDefaults = NSUserDefaultsController.sharedUserDefaultsController()
             userDefaults.removeObserver_forKeyPath_(
-                Tab.graphicView(), f"values.{KEY_ROTATIONSBUTTON}"
+                tab.graphicView(), f"values.{KEY_ROTATIONSBUTTON}"
             )
 
     @objc.python_method
     def rotation_transform(self, angle, center):
-        try:
-            rotation = NSAffineTransform.transform()
-            rotation.translateXBy_yBy_(center.x, center.y)
-            rotation.rotateByDegrees_(angle)
-            rotation.translateXBy_yBy_(-center.x, -center.y)
-            return rotation
-        except Exception as e:
-            self.logToConsole("rotation_transform: %s" % str(e))
+        rotation = NSAffineTransform.transform()
+        rotation.translateXBy_yBy_(center.x, center.y)
+        rotation.rotateByDegrees_(angle)
+        rotation.translateXBy_yBy_(-center.x, -center.y)
+        return rotation
 
     @objc.python_method
     def rotation(self, x, y, angle):
@@ -207,21 +201,19 @@ class ShowRotated(ReporterPlugin):
 
     @objc.python_method
     def selected_paths(self, layer):
-        result = []
-        selected_shapes = layer.selectedObjects()["shapes"]
-        for shape in selected_shapes:
-            if isinstance(shape, GSPath):
-                result.append(shape)
-        return result
+        # fmt: off
+        return [shape for shape in layer.selectedObjects()["shapes"] if isinstance(shape, GSPath)]
+        # fmt: on
 
     @objc.python_method
     def draw_rotated(self, layer):
         angle = self.slider_menu_view.group.slider.get()
         bezier_path = layer.copyDecomposedLayer().bezierPath
-        dash_count_phase = [4 / self.getScale(), 4 / self.getScale()], 2, 0
         if not bezier_path:
             return
+
         try:
+            dash_count_phase = [4 / self.getScale(), 4 / self.getScale()], 2, 0
             bounds = bezier_path.bounds()
 
             if self.slider_menu_view.group.checkbox_selection_mode.get() == True:
