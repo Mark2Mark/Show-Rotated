@@ -15,6 +15,7 @@ from GlyphsApp import GSPath, objcObject, TABDIDOPEN, TABWILLCLOSE, Glyphs
 from GlyphsApp.plugins import ReporterPlugin, pathForResource, objc
 from vanilla import Window, Slider, Group, CheckBox  # type: ignore
 from typing import List, Optional
+from CoreFoundation import CGRect
 
 # ------------------
 # Shut up Pylance
@@ -72,6 +73,7 @@ KEY_FLIPPED_HORIZONTAL = "com_markfromberg_showRotated_flip_horizontal"
 KEY_FLIPPED_VERTICAL = "com_markfromberg_showRotated_flip_vertical"
 KEY_ONLY_SELECTION = "com_markfromberg_showRotated_only_selection"
 KEY_SUPERIMPOSED = "com_markfromberg_showRotated_superimposed"
+KEY_ROTATION_ANGLE = "com_markfromberg_showRotated_angle"
 
 
 class ShowRotated(ReporterPlugin):
@@ -111,26 +113,25 @@ class ShowRotated(ReporterPlugin):
         view_height = 123
         self.slider_menu_view = Window((view_width, view_height))
         self.slider_menu_view.group = Group((0, 0, view_width, view_height))
+        self.slider_menu_view.group.checkbox_superimposed = CheckBox(
+            (20, 0, -1, 25), "Superimpose in Layer", callback=self.update
+        )
         self.slider_menu_view.group.slider = Slider(
-            (20, 0, -1, 25),
+            (20, 28, -1, 25),
             tickMarkCount=17,
             maxValue=360,
             stopOnTickMarks=True,
             continuous=True,
             callback=self.update,
         )
-        self.slider_menu_view.group.slider.set(180)
         self.slider_menu_view.group.horizontal = CheckBox(
-            (20, 28, -1, 25), "Flip Horizontally", callback=self.update
+            (20, 48, -1, 25), "Flip Horizontally", callback=self.update
         )
         self.slider_menu_view.group.vertical = CheckBox(
-            (20, 48, -1, 25), "Flip Vertically", callback=self.update
+            (20, 68, -1, 25), "Flip Vertically", callback=self.update
         )
         self.slider_menu_view.group.checkbox_selection_mode = CheckBox(
-            (20, 68, -1, 25), "Rotate Selection Only", callback=self.update
-        )
-        self.slider_menu_view.group.checkbox_superimposed = CheckBox(
-            (20, 88, -1, 25), "Superimpose in Layer", callback=self.update
+            (20, 88, -1, 25), "Rotate Selection Only", callback=self.update
         )
         self.generalContextMenus = [
             {"name": "%s:" % self.name, "action": None},
@@ -146,7 +147,12 @@ class ShowRotated(ReporterPlugin):
                 KEY_FLIPPED_VERTICAL: False,
                 KEY_ONLY_SELECTION: False,
                 KEY_SUPERIMPOSED: True,
+                KEY_ROTATION_ANGLE: 180,
             }
+        )
+        # fmt: off
+        self.slider_menu_view.group.checkbox_superimposed.getNSButton().bind_toObject_withKeyPath_options_(
+            "value", userDefaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
         )
         self.slider_menu_view.group.horizontal.getNSButton().bind_toObject_withKeyPath_options_(
             "value", userDefaults, objcObject(f"values.{KEY_FLIPPED_HORIZONTAL}"), None
@@ -157,9 +163,23 @@ class ShowRotated(ReporterPlugin):
         self.slider_menu_view.group.checkbox_selection_mode.getNSButton().bind_toObject_withKeyPath_options_(
             "value", userDefaults, objcObject(f"values.{KEY_ONLY_SELECTION}"), None
         )
-        self.slider_menu_view.group.checkbox_superimposed.getNSButton().bind_toObject_withKeyPath_options_(
-            "value", userDefaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
+        self.slider_menu_view.group.slider.getNSSlider().bind_toObject_withKeyPath_options_(
+            "value", userDefaults, objcObject(f"values.{KEY_ROTATION_ANGLE}"), None
         )
+        # Enable/Disable
+        self.slider_menu_view.group.slider.getNSSlider().bind_toObject_withKeyPath_options_(
+            "enabled", userDefaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
+        )
+        self.slider_menu_view.group.horizontal.getNSButton().bind_toObject_withKeyPath_options_(
+            "enabled", userDefaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
+        )
+        self.slider_menu_view.group.vertical.getNSButton().bind_toObject_withKeyPath_options_(
+            "enabled", userDefaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
+        )
+        self.slider_menu_view.group.checkbox_selection_mode.getNSButton().bind_toObject_withKeyPath_options_(
+            "enabled", userDefaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
+        )
+        # fmt: on
 
     @objc.python_method
     def start(self):
@@ -249,7 +269,7 @@ class ShowRotated(ReporterPlugin):
 
     @objc.python_method
     def draw_rotated(self, layer):
-        angle = self.slider_menu_view.group.slider.get()
+        angle = int(Glyphs.defaults[KEY_ROTATION_ANGLE])
         bezier_path = layer.copyDecomposedLayer().bezierPath
         if not bezier_path:
             return
@@ -257,7 +277,7 @@ class ShowRotated(ReporterPlugin):
         try:
             NSColor.colorWithCalibratedRed_green_blue_alpha_(*self.color).set()
             bounds = bezier_path.bounds()
-            if self.slider_menu_view.group.checkbox_selection_mode.get():
+            if Glyphs.boolDefaults[KEY_ONLY_SELECTION]:
                 selected_paths = NSBezierPath.alloc().init()
                 layer_paths_selected = self.selected_paths(layer)
                 if not layer_paths_selected:
@@ -275,9 +295,12 @@ class ShowRotated(ReporterPlugin):
             print(traceback.format_exc())
 
     def get_center(self, bounds):
-        x = bounds.origin.x + 0.5 * bounds.size.width
-        y = bounds.origin.y + 0.5 * bounds.size.height
-        return x, y
+        try:
+            x = bounds.origin.x + 0.5 * bounds.size.width
+            y = bounds.origin.y + 0.5 * bounds.size.height
+            return x, y
+        except:
+            return 0, 0
 
     def transform_path(self, bezier_path, x, y, angle):
         rotation = self.rotation(x, y, angle)
@@ -287,10 +310,10 @@ class ShowRotated(ReporterPlugin):
         flip_transform = NSAffineTransform.transform()
         flip_transform.translateXBy_yBy_(x, y)
 
-        if self.slider_menu_view.group.horizontal.get():
+        if Glyphs.boolDefaults[KEY_FLIPPED_HORIZONTAL]:
             flip_transform.scaleXBy_yBy_(-1, 1)
             self.draw_mirror_line(x, NSMaxY(bounds), x, NSMinY(bounds), x, y, 0)
-        if self.slider_menu_view.group.vertical.get():
+        if Glyphs.boolDefaults[KEY_FLIPPED_VERTICAL]:
             flip_transform.scaleXBy_yBy_(1, -1)
             self.draw_mirror_line(
                 NSMinX(bounds), NSMidY(bounds), NSMaxX(bounds), NSMidY(bounds), x, y, 0
@@ -298,8 +321,8 @@ class ShowRotated(ReporterPlugin):
 
         flip_transform.translateXBy_yBy_(-x, -y)
         if (
-            self.slider_menu_view.group.horizontal.get()
-            or self.slider_menu_view.group.vertical.get()
+            Glyphs.boolDefaults[KEY_FLIPPED_HORIZONTAL]
+            or Glyphs.boolDefaults[KEY_FLIPPED_VERTICAL]
         ):
             bezier_path.transformUsingAffineTransform_(flip_transform)
 
@@ -339,14 +362,12 @@ class ShowRotated(ReporterPlugin):
         center_cross_2.stroke()
 
     def draw_gradient(self, bounds, x, y):
-        do_flip_horizontal = self.slider_menu_view.group.horizontal.get()
-        do_flip_vertical = self.slider_menu_view.group.vertical.get()
         thickness = 100
         mirror_color = NSColor.colorWithDeviceRed_green_blue_alpha_(
             *self.color[:3], 0.2
         )
         mirror_color_clear = NSColor.clearColor()
-        if do_flip_horizontal:
+        if Glyphs.boolDefaults[KEY_FLIPPED_HORIZONTAL]:
             gradient_rect_horizontal = NSMakeRect(
                 x, NSMinY(bounds), thickness, NSHeight(bounds)
             )
@@ -357,7 +378,7 @@ class ShowRotated(ReporterPlugin):
                 [mirror_color, mirror_color_clear]
             )
             gradient_horizontal.drawInBezierPath_angle_(gradient_path_horizontal, 0)
-        if do_flip_vertical:
+        if Glyphs.boolDefaults[KEY_FLIPPED_VERTICAL]:
             gradient_rect_vertical = NSMakeRect(
                 NSMinX(bounds), NSMidY(bounds), NSWidth(bounds), thickness
             )
@@ -451,12 +472,13 @@ class ShowRotated(ReporterPlugin):
 
                 layer_path.fill()
 
-                # base_position_transform.translateXBy_yBy_(layer.width + padding, 0)
-                base_position_transform.translateXBy_yBy_(
-                    max(NSWidth(bounds), NSHeight(bounds)) + padding, 0
-                )
-                # layer_path_bounds = layer_path.bounds()
-                # base_position_transform.translateXBy_yBy_(NSWidth(layer_path_bounds), 0)
+                if isinstance(bounds, CGRect):
+                    # base_position_transform.translateXBy_yBy_(layer.width + padding, 0)
+                    base_position_transform.translateXBy_yBy_(
+                        max(NSWidth(bounds), NSHeight(bounds)) + padding, 0
+                    )
+                    # layer_path_bounds = layer_path.bounds()
+                    # base_position_transform.translateXBy_yBy_(NSWidth(layer_path_bounds), 0)
 
             except:
                 print(traceback.format_exc())
