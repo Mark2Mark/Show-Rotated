@@ -75,7 +75,29 @@ class ShowRotated(ReporterPlugin):
     def settings(self):
         self.name = "Rotated"
         self.color = 0.0, 0.5, 0.3, 0.3
-        self.menuName = Glyphs.localize({"en": "Rotated", "de": "Rotiert"})
+        self.menuName = Glyphs.localize(
+            {
+                "en": "Rotated",
+                "de": "Rotiert",
+                "es": "Rotado",
+                "it": "Ruotato",
+                "fr": "Tourné",
+                "ko": "회전",
+                "zh": "旋转",
+                "ar": "مدور",
+                "el": "Περιστραμμένο",
+                "hi": "घुमाया हुआ",
+                "sv": "Roterad",
+                "no": "Roterte",
+                "da": "Roteret",
+                "pl": "Obrócone",
+                "cs": "Otočeno",
+                "pt": "Rotacionado",
+                "th": "หมุน",
+                "vi": "Xoay",
+            }
+        )
+
         self.setup_ui()
 
     def setup_ui(self):
