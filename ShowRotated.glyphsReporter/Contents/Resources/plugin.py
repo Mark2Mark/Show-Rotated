@@ -447,7 +447,6 @@ class ShowRotated(ReporterPlugin):
 
             try:
                 rotation_degrees = 90 * i
-                # TODO: refactor this bounds code. Used in several spots now.
                 bounds = layer.bounds
                 x, y = self.get_center(bounds)
 
