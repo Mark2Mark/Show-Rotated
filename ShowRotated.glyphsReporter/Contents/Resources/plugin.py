@@ -103,7 +103,7 @@ class ShowRotated(ReporterPlugin):
             }
         )
         self.name = self.menuName
-        self.button = NSButton.alloc().initWithFrame_(NSMakeRect(0, 0, 18, 14))
+        self.button_instances = []
 
         self.setup_ui()
         self.setup_defaults()
@@ -196,21 +196,23 @@ class ShowRotated(ReporterPlugin):
     def addRotationsButton_(self, notification):
         tab = notification.object()
         if hasattr(tab, "addViewToBottomToolbar_"):
-            self.button.setBezelStyle_(NSTexturedRoundedBezelStyle)
-            self.button.setBordered_(False)
-            self.button.setButtonType_(NSToggleButton)
-            self.button.setTitle_("")
-            self.button.cell().setImagePosition_(NSImageOnly)
-            self.button.cell().setImageScaling_(NSImageScaleNone)
-            self.button.setImage_(self.toolBarIcon)
-            self.button.setToolTip_(self.menuName)
-            tab.addViewToBottomToolbar_(self.button)
+            bottom_button = NSButton.alloc().initWithFrame_(NSMakeRect(0, 0, 18, 14))
+            bottom_button.setBezelStyle_(NSTexturedRoundedBezelStyle)
+            bottom_button.setBordered_(False)
+            bottom_button.setButtonType_(NSToggleButton)
+            bottom_button.setTitle_("")
+            bottom_button.cell().setImagePosition_(NSImageOnly)
+            bottom_button.cell().setImageScaling_(NSImageScaleNone)
+            bottom_button.setImage_(self.toolBarIcon)
+            bottom_button.setToolTip_(self.menuName)
+            tab.addViewToBottomToolbar_(bottom_button)
+            self.button_instances.append(bottom_button)
             try:
-                tab.tempData["rotationsButton"] = self.button  # Glyphs 3
+                tab.tempData["rotationsButton"] = bottom_button  # Glyphs 3
             except:
-                tab.userData["rotationsButton"] = self.button  # Glyphs 2
+                tab.userData["rotationsButton"] = bottom_button  # Glyphs 2
             userDefaults = NSUserDefaultsController.sharedUserDefaultsController()
-            self.button.bind_toObject_withKeyPath_options_(
+            bottom_button.bind_toObject_withKeyPath_options_(
                 "value",
                 userDefaults,
                 objcObject(f"values.{KEY_ROTATIONSBUTTON}"),
@@ -223,18 +225,23 @@ class ShowRotated(ReporterPlugin):
                 123,
             )
 
+            self.toggle_buttons_hidden(
+                True
+            )  # Hide all buttons first, otherwise they show when the plugin is off but a font with tabs is opened.
+
     def removeRotationsButton_(self, notification):
         tab = notification.object()
         try:
-            self.button = tab.tempData["rotationsButton"]  # Glyphs 3
+            bottom_button = tab.tempData["rotationsButton"]  # Glyphs 3
         except:
-            self.button = tab.userData["rotationsButton"]  # Glyphs 2
-        if self.button != None:
-            self.button.unbind_("value")
+            bottom_button = tab.userData["rotationsButton"]  # Glyphs 2
+        if bottom_button != None:
+            bottom_button.unbind_("value")
             userDefaults = NSUserDefaultsController.sharedUserDefaultsController()
             userDefaults.removeObserver_forKeyPath_(
                 tab.graphicView(), f"values.{KEY_ROTATIONSBUTTON}"
             )
+            self.button_instances.remove(bottom_button)
 
     # @objc.python_method
     # def rotation_transform(self, angle, center):
@@ -244,11 +251,17 @@ class ShowRotated(ReporterPlugin):
     #     rotation.translateXBy_yBy_(-center.x, -center.y)
     #     return rotation
 
+    @objc.python_method
+    def toggle_buttons_hidden(self, value):
+        for bottom_button in self.button_instances:
+            if bottom_button:
+                bottom_button.setHidden_(value)
+
     def willActivate(self):
-        self.button.setHidden_(False)
+        self.toggle_buttons_hidden(False)
 
     def willDeactivate(self):
-        self.button.setHidden_(True)
+        self.toggle_buttons_hidden(True)
 
     @objc.python_method
     def rotation(self, x, y, angle):
