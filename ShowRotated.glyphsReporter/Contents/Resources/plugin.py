@@ -31,6 +31,7 @@ from AppKit import (
     NSImage,  # type: ignore
     NSMinX,  # type: ignore
     NSMaxY,  # type: ignore
+    NSMidX,  # type: ignore
     NSMidY,  # type: ignore
     NSMinY,  # type: ignore
     NSHeight,  # type: ignore
@@ -309,9 +310,10 @@ class ShowRotated(ReporterPlugin):
 
     def get_center(self, bounds):
         try:
-            x = bounds.origin.x + 0.5 * bounds.size.width
-            y = bounds.origin.y + 0.5 * bounds.size.height
-            return x, y
+            return (
+                bounds.origin.x + 0.5 * bounds.size.width,
+                bounds.origin.y + 0.5 * bounds.size.height,
+            )
         except:
             return 0, 0
 
@@ -449,6 +451,12 @@ class ShowRotated(ReporterPlugin):
                 rotation_degrees = 90 * i
                 bounds = layer.bounds
                 bounds_orientation_sideways = rotation_degrees / 90 % 2 == 1
+
+                if bounds_orientation_sideways:
+                    base_position_transform.translateXBy_yBy_(NSHeight(bounds) / 2, 0)
+                else:
+                    base_position_transform.translateXBy_yBy_(NSWidth(bounds) / 2, 0)
+
                 x, y = self.get_center(bounds)
 
                 label = NSString.stringWithString_(
@@ -482,21 +490,14 @@ class ShowRotated(ReporterPlugin):
                     NSColor.whiteColor().set()
                 else:
                     NSColor.blackColor().set()
-
                 layer_path.fill()
 
-                if isinstance(bounds, CGRect):
-                    base_position_transform.translateXBy_yBy_(
-                        (
-                            (
-                                NSHeight(bounds)
-                                if bounds_orientation_sideways
-                                else NSWidth(bounds)
-                            )
-                            + padding
-                        ),
-                        0,
-                    )
+                if bounds_orientation_sideways:
+                    base_position_transform.translateXBy_yBy_(NSHeight(bounds) / 2, 0)
+                else:
+                    base_position_transform.translateXBy_yBy_(NSWidth(bounds) / 2, 0)
+
+                base_position_transform.translateXBy_yBy_(padding, 0)
 
             except:
                 print(traceback.format_exc())
