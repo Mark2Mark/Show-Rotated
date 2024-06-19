@@ -112,12 +112,12 @@ class ShowRotated(ReporterPlugin):
     def setup_ui(self):
         view_width = 170
         view_height = 123
-        self.slider_menu_view = Window((view_width, view_height))
-        self.slider_menu_view.group = Group((0, 0, view_width, view_height))
-        self.slider_menu_view.group.checkbox_superimposed = CheckBox(
+        self.rotated_menu = Window((view_width, view_height))
+        self.rotated_menu.group = Group((0, 0, view_width, view_height))
+        self.rotated_menu.group.checkbox_superimposed = CheckBox(
             (20, 0, -1, 25), "Superimpose in Layer", callback=self.update
         )
-        self.slider_menu_view.group.slider = Slider(
+        self.rotated_menu.group.slider = Slider(
             (20, 28, -1, 25),
             tickMarkCount=17,
             maxValue=360,
@@ -125,24 +125,24 @@ class ShowRotated(ReporterPlugin):
             continuous=True,
             callback=self.update,
         )
-        self.slider_menu_view.group.horizontal = CheckBox(
+        self.rotated_menu.group.horizontal = CheckBox(
             (20, 48, -1, 25), "Flip Horizontally", callback=self.update
         )
-        self.slider_menu_view.group.vertical = CheckBox(
+        self.rotated_menu.group.vertical = CheckBox(
             (20, 68, -1, 25), "Flip Vertically", callback=self.update
         )
-        self.slider_menu_view.group.checkbox_selection_mode = CheckBox(
+        self.rotated_menu.group.checkbox_selection_mode = CheckBox(
             (20, 88, -1, 25), "Rotate Selection Only", callback=self.update
         )
         self.generalContextMenus = [
             {"name": "%s:" % self.name, "action": None},
-            {"view": self.slider_menu_view.group.getNSView()},
+            {"view": self.rotated_menu.group.getNSView()},
         ]
 
     def setup_defaults(self):
         """Assumes that the UI is set up by now"""
-        userDefaults = NSUserDefaultsController.sharedUserDefaultsController()
-        userDefaults.defaults().registerDefaults_(
+        user_defaults = NSUserDefaultsController.sharedUserDefaultsController()
+        user_defaults.defaults().registerDefaults_(
             {
                 KEY_FLIPPED_HORIZONTAL: False,
                 KEY_FLIPPED_VERTICAL: False,
@@ -152,33 +152,33 @@ class ShowRotated(ReporterPlugin):
             }
         )
         # fmt: off
-        self.slider_menu_view.group.checkbox_superimposed.getNSButton().bind_toObject_withKeyPath_options_(
-            "value", userDefaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
+        self.rotated_menu.group.checkbox_superimposed.getNSButton().bind_toObject_withKeyPath_options_(
+            "value", user_defaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
         )
-        self.slider_menu_view.group.horizontal.getNSButton().bind_toObject_withKeyPath_options_(
-            "value", userDefaults, objcObject(f"values.{KEY_FLIPPED_HORIZONTAL}"), None
+        self.rotated_menu.group.horizontal.getNSButton().bind_toObject_withKeyPath_options_(
+            "value", user_defaults, objcObject(f"values.{KEY_FLIPPED_HORIZONTAL}"), None
         )
-        self.slider_menu_view.group.vertical.getNSButton().bind_toObject_withKeyPath_options_(
-            "value", userDefaults, objcObject(f"values.{KEY_FLIPPED_VERTICAL}"), None
+        self.rotated_menu.group.vertical.getNSButton().bind_toObject_withKeyPath_options_(
+            "value", user_defaults, objcObject(f"values.{KEY_FLIPPED_VERTICAL}"), None
         )
-        self.slider_menu_view.group.checkbox_selection_mode.getNSButton().bind_toObject_withKeyPath_options_(
-            "value", userDefaults, objcObject(f"values.{KEY_ONLY_SELECTION}"), None
+        self.rotated_menu.group.checkbox_selection_mode.getNSButton().bind_toObject_withKeyPath_options_(
+            "value", user_defaults, objcObject(f"values.{KEY_ONLY_SELECTION}"), None
         )
-        self.slider_menu_view.group.slider.getNSSlider().bind_toObject_withKeyPath_options_(
-            "value", userDefaults, objcObject(f"values.{KEY_ROTATION_ANGLE}"), None
+        self.rotated_menu.group.slider.getNSSlider().bind_toObject_withKeyPath_options_(
+            "value", user_defaults, objcObject(f"values.{KEY_ROTATION_ANGLE}"), None
         )
         # Enable/Disable
-        self.slider_menu_view.group.slider.getNSSlider().bind_toObject_withKeyPath_options_(
-            "enabled", userDefaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
+        self.rotated_menu.group.slider.getNSSlider().bind_toObject_withKeyPath_options_(
+            "enabled", user_defaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
         )
-        self.slider_menu_view.group.horizontal.getNSButton().bind_toObject_withKeyPath_options_(
-            "enabled", userDefaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
+        self.rotated_menu.group.horizontal.getNSButton().bind_toObject_withKeyPath_options_(
+            "enabled", user_defaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
         )
-        self.slider_menu_view.group.vertical.getNSButton().bind_toObject_withKeyPath_options_(
-            "enabled", userDefaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
+        self.rotated_menu.group.vertical.getNSButton().bind_toObject_withKeyPath_options_(
+            "enabled", user_defaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
         )
-        self.slider_menu_view.group.checkbox_selection_mode.getNSButton().bind_toObject_withKeyPath_options_(
-            "enabled", userDefaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
+        self.rotated_menu.group.checkbox_selection_mode.getNSButton().bind_toObject_withKeyPath_options_(
+            "enabled", user_defaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
         )
         # fmt: on
 
@@ -212,14 +212,14 @@ class ShowRotated(ReporterPlugin):
                 tab.tempData["rotationsButton"] = bottom_button  # Glyphs 3
             except:
                 tab.userData["rotationsButton"] = bottom_button  # Glyphs 2
-            userDefaults = NSUserDefaultsController.sharedUserDefaultsController()
+            user_defaults = NSUserDefaultsController.sharedUserDefaultsController()
             bottom_button.bind_toObject_withKeyPath_options_(
                 "value",
-                userDefaults,
+                user_defaults,
                 objcObject(f"values.{KEY_ROTATIONSBUTTON}"),
                 None,
             )
-            userDefaults.addObserver_forKeyPath_options_context_(
+            user_defaults.addObserver_forKeyPath_options_context_(
                 tab.graphicView(),
                 objcObject(f"values.{KEY_ROTATIONSBUTTON}"),
                 0,
@@ -238,8 +238,8 @@ class ShowRotated(ReporterPlugin):
             bottom_button = tab.userData["rotationsButton"]  # Glyphs 2
         if bottom_button != None:
             bottom_button.unbind_("value")
-            userDefaults = NSUserDefaultsController.sharedUserDefaultsController()
-            userDefaults.removeObserver_forKeyPath_(
+            user_defaults = NSUserDefaultsController.sharedUserDefaultsController()
+            user_defaults.removeObserver_forKeyPath_(
                 tab.graphicView(), f"values.{KEY_ROTATIONSBUTTON}"
             )
             self.button_instances.remove(bottom_button)
@@ -409,9 +409,9 @@ class ShowRotated(ReporterPlugin):
     def update(self, sender):
         try:
             Glyphs = NSApplication.sharedApplication()
-            currentTabView = Glyphs.font.currentTab
-            if currentTabView:
-                currentTabView.graphicView().setNeedsDisplay_(True)
+            current_tab_view = Glyphs.font.currentTab
+            if current_tab_view:
+                current_tab_view.graphicView().setNeedsDisplay_(True)
         except:
             pass
 
