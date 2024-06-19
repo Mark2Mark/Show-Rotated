@@ -462,17 +462,6 @@ class ShowRotated(ReporterPlugin):
                 label = NSString.stringWithString_(
                     f"{rotation_degrees % 360}° {'↔' if i > 3 else ''}"
                 )
-                label.drawInRect_withAttributes_(
-                    NSRect(
-                        (
-                            base_position_transform.transformStruct().tX - padding / 2,
-                            layer.descender - label_height,
-                        ),
-                        # (NSWidth(bounds) + padding, label_height),
-                        (layer.width + padding, label_height),
-                    ),
-                    string_attributes,
-                )
 
                 rotation_transform.translateXBy_yBy_(x, y)
                 if i > 3:
@@ -491,6 +480,17 @@ class ShowRotated(ReporterPlugin):
                 else:
                     NSColor.blackColor().set()
                 layer_path.fill()
+
+                label.drawInRect_withAttributes_(
+                    NSRect(
+                        (
+                            NSMinX(layer_path.bounds()) - padding,
+                            layer.descender - label_height,
+                        ),
+                        (NSWidth(layer_path.bounds()) + padding * 2, label_height),
+                    ),
+                    string_attributes,
+                )
 
                 if bounds_orientation_sideways:
                     base_position_transform.translateXBy_yBy_(NSHeight(bounds) / 2, 0)
