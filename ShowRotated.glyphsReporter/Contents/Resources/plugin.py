@@ -431,6 +431,7 @@ class ShowRotated(ReporterPlugin):
 
         base_position_transform = NSAffineTransform.transform()
         padding = 100
+        label_height = 100
 
         paragraph_style = NSMutableParagraphStyle.alloc().init()
         paragraph_style.setAlignment_(NSCenterTextAlignment)
@@ -439,7 +440,6 @@ class ShowRotated(ReporterPlugin):
             NSForegroundColorAttributeName: NSColor.redColor(),
             NSParagraphStyleAttributeName: paragraph_style,
         }
-        label_height = 100
 
         for i in range(8):
             rotation_transform = NSAffineTransform.transform()
@@ -459,10 +459,6 @@ class ShowRotated(ReporterPlugin):
 
                 x, y = self.get_center(bounds)
 
-                label = NSString.stringWithString_(
-                    f"{rotation_degrees % 360}° {'↔' if i > 3 else ''}"
-                )
-
                 rotation_transform.translateXBy_yBy_(x, y)
                 if i > 3:
                     rotation_transform.scaleXBy_yBy_(-1, 1)
@@ -481,6 +477,9 @@ class ShowRotated(ReporterPlugin):
                     NSColor.blackColor().set()
                 layer_path.fill()
 
+                label = NSString.stringWithString_(
+                    f"{rotation_degrees % 360}° {'↔' if i > 3 else ''}"
+                )
                 label.drawInRect_withAttributes_(
                     NSRect(
                         (
