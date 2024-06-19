@@ -448,6 +448,7 @@ class ShowRotated(ReporterPlugin):
             try:
                 rotation_degrees = 90 * i
                 bounds = layer.bounds
+                bounds_orientation_sideways = rotation_degrees / 90 % 2 == 1
                 x, y = self.get_center(bounds)
 
                 label = NSString.stringWithString_(
@@ -485,12 +486,17 @@ class ShowRotated(ReporterPlugin):
                 layer_path.fill()
 
                 if isinstance(bounds, CGRect):
-                    # base_position_transform.translateXBy_yBy_(layer.width + padding, 0)
                     base_position_transform.translateXBy_yBy_(
-                        max(NSWidth(bounds), NSHeight(bounds)) + padding, 0
+                        (
+                            (
+                                NSHeight(bounds)
+                                if bounds_orientation_sideways
+                                else NSWidth(bounds)
+                            )
+                            + padding
+                        ),
+                        0,
                     )
-                    # layer_path_bounds = layer_path.bounds()
-                    # base_position_transform.translateXBy_yBy_(NSWidth(layer_path_bounds), 0)
 
             except:
                 print(traceback.format_exc())
