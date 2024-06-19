@@ -15,7 +15,7 @@ from GlyphsApp import GSPath, objcObject, TABDIDOPEN, TABWILLCLOSE, Glyphs
 from GlyphsApp.plugins import ReporterPlugin, pathForResource, objc
 from vanilla import Window, Slider, Group, CheckBox  # type: ignore
 from typing import List, Optional
-from CoreFoundation import CGRect
+from CoreFoundation import CGRect  # type: ignore
 
 # ------------------
 # Shut up Pylance
@@ -273,7 +273,7 @@ class ShowRotated(ReporterPlugin):
         return rotation
 
     @objc.python_method
-    def selected_paths(self, layer) -> Optional[List[GSPath]]:
+    def selected_paths(self, layer) -> Optional[List[GSPath]]:  # type: ignore
         try:
             # fmt: off
             return [shape for shape in layer.selectedObjects()["shapes"] if isinstance(shape, GSPath)]
