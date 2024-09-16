@@ -60,6 +60,7 @@ from AppKit import (
 
 # Changelog
 # NEW:
+# 	+ Fix observations
 # 	+ Show predefined rotations in the bottom preview
 # 	+ Add Selection Mode: draw only selected paths
 # 	+ Add Mirror axis if Flipped V/H is active
