@@ -15,10 +15,7 @@ from GlyphsApp import GSPath, objcObject, TABDIDOPEN, TABWILLCLOSE, Glyphs
 from GlyphsApp.plugins import ReporterPlugin, pathForResource, objc
 from vanilla import Window, Slider, Group, CheckBox  # type: ignore
 from typing import List, Optional
-from CoreFoundation import CGRect  # type: ignore
-
-# ------------------
-# Shut up Pylance
+import traceback
 from typing import Any
 
 Glyphs: Any = Glyphs
@@ -31,7 +28,7 @@ from AppKit import (
     NSImage,  # type: ignore
     NSMinX,  # type: ignore
     NSMaxY,  # type: ignore
-    NSMidX,  # type: ignore
+    # NSMidX,  # type: ignore
     NSMidY,  # type: ignore
     NSMinY,  # type: ignore
     NSHeight,  # type: ignore
@@ -40,7 +37,7 @@ from AppKit import (
     NSColor,  # type: ignore
     NSFont,  # type: ignore
     NSMakeRect,  # type: ignore
-    NSZeroRect,  # type: ignore
+    # NSZeroRect,  # type: ignore
     NSUserDefaults,  # type: ignore
     NSString,  # type: ignore
     NSMutableParagraphStyle,  # type: ignore
@@ -60,7 +57,6 @@ from AppKit import (
     NSImageOnly,  # type: ignore
     NSImageScaleNone,  # type: ignore
 )
-import traceback
 
 # Changelog
 # NEW:
