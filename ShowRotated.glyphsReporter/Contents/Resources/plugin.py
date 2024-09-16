@@ -186,6 +186,13 @@ class ShowRotated(ReporterPlugin):
         NSNotificationCenter.defaultCenter().addObserver_selector_name_object_(
             self, "removeRotationsButton:", TABWILLCLOSE, objc.nil
         )
+        user_defaults = NSUserDefaultsController.sharedUserDefaultsController()
+        user_defaults.addObserver_forKeyPath_options_context_(
+            self,
+            objcObject(f"values.{KEY_ROTATIONSBUTTON}"),
+            0,
+            123,
+        )
         iconPath = pathForResource("rotatedIcon", "pdf", __file__)
         self.toolBarIcon = NSImage.alloc().initWithContentsOfFile_(iconPath)
         self.toolBarIcon.setTemplate_(True)
@@ -215,13 +222,6 @@ class ShowRotated(ReporterPlugin):
                 objcObject(f"values.{KEY_ROTATIONSBUTTON}"),
                 None,
             )
-            user_defaults.addObserver_forKeyPath_options_context_(
-                tab.graphicView(),
-                objcObject(f"values.{KEY_ROTATIONSBUTTON}"),
-                0,
-                123,
-            )
-
             self.toggle_buttons_hidden(
                 True
             )  # Hide all buttons first, otherwise they show when the plugin is off but a font with tabs is opened.
