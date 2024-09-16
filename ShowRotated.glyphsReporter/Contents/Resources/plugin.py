@@ -232,13 +232,13 @@ class ShowRotated(ReporterPlugin):
             bottom_button = tab.tempData["rotationsButton"]  # Glyphs 3
         except:
             bottom_button = tab.userData["rotationsButton"]  # Glyphs 2
-        if bottom_button != None:
+        if bottom_button is not None:
             bottom_button.unbind_("value")
-            user_defaults = NSUserDefaultsController.sharedUserDefaultsController()
-            user_defaults.removeObserver_forKeyPath_(
-                tab.graphicView(), f"values.{KEY_ROTATIONSBUTTON}"
-            )
             self.button_instances.remove(bottom_button)
+
+    def observeValueForKeyPath_ofObject_change_context_(self, keypath, object, change, context):
+        # print("__observeValueForKeyPath_ofObject_change_context_ %@", keypath)
+        NSNotificationCenter.defaultCenter().postNotificationName_object_("GSRedrawEditView", None)
 
     # @objc.python_method
     # def rotation_transform(self, angle, center):
