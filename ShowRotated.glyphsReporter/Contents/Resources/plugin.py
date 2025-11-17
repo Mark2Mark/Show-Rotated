@@ -87,7 +87,8 @@ class ShowRotated(ReporterPlugin):
                 "it": "Ruotato",
                 "fr": "Tourné",
                 "ko": "회전",
-                "zh": "旋转",
+                "zh-Hans": "旋转",
+                "zh-Hant": "旋轉",
                 "ar": "مدور",
                 "el": "Περιστραμμένο",
                 "hi": "घुमाया हुआ",
@@ -562,6 +563,35 @@ class ShowRotated(ReporterPlugin):
         if not Glyphs.boolDefaults[KEY_ROTATIONSBUTTON]:
             return
 
+        try:
+            # Check if there are any selected layers
+            selected_layers = Glyphs.font.selectedLayers
+            if len(selected_layers) == 0:
+                return
+            
+            # Get the currently selected character
+            current_layer = selected_layers[0]
+            current_glyph = current_layer.parent
+            
+            # Get the glyph of the preview layer
+            layer_glyph = layer.parent
+            
+            # If glyph names are different, skip this glyph
+            if current_glyph.name != layer_glyph.name:
+                return
+                
+            # Check layer matching conditions
+            # If it's the same glyph but different layer, and not a preview layer, don't draw
+            if current_layer.layerId != layer.layerId and layer.name != "Preview":
+                # In some special cases, preview layer might not have a name
+                if not hasattr(layer, "isPreviewLayer") or not layer.isPreviewLayer:
+                    return
+
+        except Exception as e:
+            print(f"Selection check error: {str(e)}")
+            print(traceback.format_exc())
+            return
+
         is_black = NSUserDefaults.standardUserDefaults().boolForKey_("GSPreview_Black")
 
         base_position_transform = NSAffineTransform.transform()
@@ -576,6 +606,7 @@ class ShowRotated(ReporterPlugin):
             NSParagraphStyleAttributeName: paragraph_style,
         }
 
+        # Draw 8 different rotation angles
         for i in range(8):
             rotation_transform = NSAffineTransform.transform()
             layer_path = layer.completeBezierPath.copy()
@@ -633,5 +664,6 @@ class ShowRotated(ReporterPlugin):
 
                 base_position_transform.translateXBy_yBy_(padding, 0)
 
-            except:
+            except Exception as e:
+                print(f"Rotation drawing error: {str(e)}")
                 print(traceback.format_exc())
