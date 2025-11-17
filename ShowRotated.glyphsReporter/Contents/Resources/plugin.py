@@ -11,7 +11,7 @@
 #
 ###########################################################################################################
 
-from GlyphsApp import GSPath, objcObject, TABDIDOPEN, TABWILLCLOSE, Glyphs
+from GlyphsApp import GSPath, objcObject, TABDIDOPEN, TABWILLCLOSE, Glyphs, OFFCURVE
 from GlyphsApp.plugins import ReporterPlugin, pathForResource, objc
 from vanilla import Window, Slider, Group, CheckBox  # type: ignore
 from typing import List, Optional
@@ -72,6 +72,7 @@ KEY_FLIPPED_VERTICAL = "com_markfromberg_showRotated_flip_vertical"
 KEY_ONLY_SELECTION = "com_markfromberg_showRotated_only_selection"
 KEY_SUPERIMPOSED = "com_markfromberg_showRotated_superimposed"
 KEY_ROTATION_ANGLE = "com_markfromberg_showRotated_angle"
+KEY_SHOW_NODES = "com_markfromberg_showRotated_show_nodes"
 
 
 class ShowRotated(ReporterPlugin):
@@ -108,7 +109,7 @@ class ShowRotated(ReporterPlugin):
 
     def setup_ui(self):
         view_width = 170
-        view_height = 123
+        view_height = 143
         self.rotated_menu = Window((view_width, view_height))
         self.rotated_menu.group = Group((0, 0, view_width, view_height))
         self.rotated_menu.group.checkbox_superimposed = CheckBox(
@@ -131,6 +132,9 @@ class ShowRotated(ReporterPlugin):
         self.rotated_menu.group.checkbox_selection_mode = CheckBox(
             (20, 88, -1, 25), "Rotate Selection Only", callback=self.update
         )
+        self.rotated_menu.group.checkbox_show_nodes = CheckBox(
+            (20, 108, -1, 25), "Show Nodes", callback=self.update
+        )
         self.generalContextMenus = [
             {"name": "%s:" % self.name, "action": None},
             {"view": self.rotated_menu.group.getNSView()},
@@ -146,6 +150,7 @@ class ShowRotated(ReporterPlugin):
                 KEY_ONLY_SELECTION: False,
                 KEY_SUPERIMPOSED: True,
                 KEY_ROTATION_ANGLE: 180,
+                KEY_SHOW_NODES: True,
             }
         )
         # fmt: off
@@ -161,6 +166,9 @@ class ShowRotated(ReporterPlugin):
         self.rotated_menu.group.checkbox_selection_mode.getNSButton().bind_toObject_withKeyPath_options_(
             "value", user_defaults, objcObject(f"values.{KEY_ONLY_SELECTION}"), None
         )
+        self.rotated_menu.group.checkbox_show_nodes.getNSButton().bind_toObject_withKeyPath_options_(
+            "value", user_defaults, objcObject(f"values.{KEY_SHOW_NODES}"), None
+        )
         self.rotated_menu.group.slider.getNSSlider().bind_toObject_withKeyPath_options_(
             "value", user_defaults, objcObject(f"values.{KEY_ROTATION_ANGLE}"), None
         )
@@ -175,6 +183,9 @@ class ShowRotated(ReporterPlugin):
             "enabled", user_defaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
         )
         self.rotated_menu.group.checkbox_selection_mode.getNSButton().bind_toObject_withKeyPath_options_(
+            "enabled", user_defaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
+        )
+        self.rotated_menu.group.checkbox_show_nodes.getNSButton().bind_toObject_withKeyPath_options_(
             "enabled", user_defaults, objcObject(f"values.{KEY_SUPERIMPOSED}"), None
         )
         # fmt: on
@@ -288,6 +299,8 @@ class ShowRotated(ReporterPlugin):
         try:
             NSColor.colorWithCalibratedRed_green_blue_alpha_(*self.color).set()
             bounds = bezier_path.bounds()
+            paths_to_draw = None
+
             if Glyphs.boolDefaults[KEY_ONLY_SELECTION]:
                 selected_paths = NSBezierPath.alloc().init()
                 layer_paths_selected = self.selected_paths(layer)
@@ -297,13 +310,138 @@ class ShowRotated(ReporterPlugin):
                     selected_paths.appendBezierPath_(p.bezierPath)
                 bezier_path = selected_paths
                 bounds = selected_paths.bounds()
+                paths_to_draw = layer_paths_selected
+            else:
+                paths_to_draw = layer.paths
 
             x, y = self.get_center(bounds)
             self.transform_path(bezier_path, x, y, angle)
             self.apply_flip_transformations(bezier_path, bounds, x, y)
             self.draw_path(bezier_path, bounds, x, y)
+
+            # Draw nodes and handles if enabled
+            if Glyphs.boolDefaults[KEY_SHOW_NODES] and paths_to_draw:
+                scale = self.getScale()
+                self.drawNodesAndHandles(paths_to_draw, x, y, angle, scale)
         except:
             print(traceback.format_exc())
+
+    @objc.python_method
+    def drawNodesAndHandles(self, paths, center_x, center_y, angle, scale):
+        try:
+            oncurveColor = NSColor.colorWithCalibratedRed_green_blue_alpha_(
+                *self.color[:3], 0.9
+            )
+            offcurveColor = NSColor.colorWithCalibratedRed_green_blue_alpha_(
+                *self.color[:3], 0.7
+            )
+            handleLineColor = NSColor.colorWithCalibratedRed_green_blue_alpha_(
+                *self.color[:3], 0.4
+            )
+
+            nodeSize = 8 / scale
+            handleLineWidth = 1 / scale
+
+            for path in paths:
+                nodes = path.nodes
+                if not nodes:
+                    continue
+
+                self.drawHandleLines(
+                    nodes, center_x, center_y, angle, handleLineWidth, handleLineColor
+                )
+
+                for node in nodes:
+                    x, y = self.transformPoint(node.position.x, node.position.y, center_x, center_y, angle)
+
+                    if node.type == OFFCURVE:
+                        self.drawNode(x, y, nodeSize * 0.6, offcurveColor)
+                    else:
+                        self.drawNode(x, y, nodeSize, oncurveColor)
+
+        except Exception as e:
+            print(f"Error drawing nodes and handles: {e}")
+
+    @objc.python_method
+    def transformPoint(self, x, y, center_x, center_y, angle):
+        """Apply rotation and flip transformations to a point"""
+        # Apply rotation
+        rotation = self.rotation(center_x, center_y, angle)
+        transformed = rotation.transformPoint_((x, y))
+
+        # Apply flip transformations if needed
+        if Glyphs.boolDefaults[KEY_FLIPPED_HORIZONTAL] or Glyphs.boolDefaults[KEY_FLIPPED_VERTICAL]:
+            flip_transform = NSAffineTransform.transform()
+            flip_transform.translateXBy_yBy_(center_x, center_y)
+
+            if Glyphs.boolDefaults[KEY_FLIPPED_HORIZONTAL]:
+                flip_transform.scaleXBy_yBy_(-1, 1)
+            if Glyphs.boolDefaults[KEY_FLIPPED_VERTICAL]:
+                flip_transform.scaleXBy_yBy_(1, -1)
+
+            flip_transform.translateXBy_yBy_(-center_x, -center_y)
+            transformed = flip_transform.transformPoint_(transformed)
+
+        return transformed
+
+    @objc.python_method
+    def drawHandleLines(self, nodes, center_x, center_y, angle, lineWidth, color):
+        try:
+            nodeCount = len(nodes)
+            for i, node in enumerate(nodes):
+                if node.type == OFFCURVE:
+                    x, y = self.transformPoint(node.position.x, node.position.y, center_x, center_y, angle)
+
+                    prevOnCurve = self.findAdjacentOnCurveNode(nodes, i, -1)
+                    nextOnCurve = self.findAdjacentOnCurveNode(nodes, i, 1)
+
+                    if prevOnCurve is not None and nextOnCurve is not None:
+                        prevNode = nodes[prevOnCurve]
+                        nextNode = nodes[nextOnCurve]
+
+                        if i < nodeCount - 1 and nodes[i + 1].type == OFFCURVE:
+                            prevX, prevY = self.transformPoint(prevNode.position.x, prevNode.position.y, center_x, center_y, angle)
+                            self.drawLine(prevX, prevY, x, y, lineWidth, color)
+                        elif i > 0 and nodes[i - 1].type == OFFCURVE:
+                            nextX, nextY = self.transformPoint(nextNode.position.x, nextNode.position.y, center_x, center_y, angle)
+                            self.drawLine(x, y, nextX, nextY, lineWidth, color)
+                        else:
+                            nextX, nextY = self.transformPoint(nextNode.position.x, nextNode.position.y, center_x, center_y, angle)
+                            self.drawLine(x, y, nextX, nextY, lineWidth, color)
+        except Exception as e:
+            print(f"Error drawing handle lines: {e}")
+
+    @objc.python_method
+    def findAdjacentOnCurveNode(self, nodes, currentIndex, direction):
+        """Find the nearest oncurve node in the given direction (1 for forward, -1 for backward)"""
+        nodeCount = len(nodes)
+        i = currentIndex
+
+        while True:
+            i = (i + direction) % nodeCount
+            if i == currentIndex:  # We've looped back, no oncurve found
+                break
+            if nodes[i].type != OFFCURVE:
+                return i
+        return None
+
+    @objc.python_method
+    def drawNode(self, x, y, size, color):
+        path = NSBezierPath.alloc().init()
+        rect = NSRect((x - size / 2, y - size / 2), (size, size))
+        ovalInRect = NSBezierPath.bezierPathWithOvalInRect_(rect)
+        path.appendBezierPath_(ovalInRect)
+        color.set()
+        path.fill()
+
+    @objc.python_method
+    def drawLine(self, x1, y1, x2, y2, lineWidth, color):
+        color.set()
+        myPath = NSBezierPath.bezierPath()
+        myPath.moveToPoint_((x1, y1))
+        myPath.lineToPoint_((x2, y2))
+        myPath.setLineWidth_(lineWidth)
+        myPath.stroke()
 
     def get_center(self, bounds):
         try:
